@@ -1,6 +1,11 @@
+"use client";
 import "./globals.css";
 import type { Metadata } from "next";
+import { store } from "./store";
+import { Provider } from "react-redux";
 import { Inter } from "next/font/google";
+import NavBar from "@/components/NavBar";
+import SideBar from "@/components/SideBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +21,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <SideBar />
+        <Provider store={store}>
+          <NavBar />
+          <div className="h-screen p-3 mt-14 sm:ml-96">{children}</div>
+        </Provider>
+      </body>
     </html>
   );
 }
