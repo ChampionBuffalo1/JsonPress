@@ -1,5 +1,4 @@
 import { ChevronRight } from "lucide-react";
-import Link from "next/link";
 
 const items = ["Dashboard", "test2"];
 
@@ -10,12 +9,12 @@ export default function SideBar() {
         <ul className="space-y-2 font-medium">
           {items.map((label, key) => (
             <li key={key}>
-              <Link
+              <a
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               >
                 <ChevronRight size={16} /> <span className="ml-3">{label}</span>
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
