@@ -1,11 +1,11 @@
-"use client";
+// "use client";
 
 import Block from "./Block";
-import { useRef } from "react";
+// import { useRef } from "react";
 const blocks = Array(3).fill(0);
 
 export default function Editor() {
-  const divRefs = useRef<HTMLDivElement[]>([]);
+  // const divRefs = useRef<HTMLDivElement[]>([]);
 
   // const handleKeyDown = useCallback(
   //   (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -24,13 +24,8 @@ export default function Editor() {
             <Block
               className="border border-dashed border-black"
               variant={key === 0 ? "h1" : "paragraph"}
-              itemKey={key}
+              itemkey={key}
               // ref={(el) => divRefs.current.push(el as HTMLDivElement)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  divRefs.current[key + 1]?.focus();
-                }
-              }}
             />
           </div>
         ))}

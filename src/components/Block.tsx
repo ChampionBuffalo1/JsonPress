@@ -25,16 +25,20 @@ const blockVariants = cva(
 export interface BlockProps
   extends Omit<React.ComponentProps<"div">, "children">,
     VariantProps<typeof blockVariants> {
-  itemKey: number;
+  itemkey: number;
 }
 
-export default function Block(props: BlockProps) {
-  const { className, variant, itemKey } = props;
+export default function Block({
+  className,
+  variant,
+  itemkey,
+  ...props
+}: BlockProps) {
   const [show, setShow] = useState<boolean>(false);
 
   return (
     <div className="w-full max-w-5xl flex mt-2 items-center">
-      <ShowIconsLeft itemKey={itemKey} show={show} />
+      <ShowIconsLeft itemkey={itemkey} show={show} />
       <div
         contentEditable
         className={cn(
@@ -48,18 +52,18 @@ export default function Block(props: BlockProps) {
         onFocus={() => setShow(true)}
         onBlur={() => setShow(false)}
       />
-      <ShowIconsRight itemKey={itemKey} show={show} />
+      <ShowIconsRight itemkey={itemkey} show={show} />
     </div>
   );
 }
 
 type SettingsProps = {
   show: boolean;
-  itemKey: number;
+  itemkey: number;
 };
 
-function ShowIconsLeft({ itemKey, show }: SettingsProps) {
-  if (itemKey === 0 || !show) return <p className="mx-7" />;
+function ShowIconsLeft({ itemkey, show }: SettingsProps) {
+  if (itemkey === 0 || !show) return <p className="mx-7" />;
   return (
     <div className="flex items-center">
       <Plus size={20} className="mr-2" />
@@ -68,7 +72,7 @@ function ShowIconsLeft({ itemKey, show }: SettingsProps) {
   );
 }
 
-function ShowIconsRight({ itemKey, show }: SettingsProps) {
-  if (itemKey === 0 || !show) return <span className="mx-4" />;
+function ShowIconsRight({ itemkey, show }: SettingsProps) {
+  if (itemkey === 0 || !show) return <span className="mx-4" />;
   return <Wrench className="ml-[0.6rem]" />;
 }
