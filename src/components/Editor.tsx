@@ -1,6 +1,4 @@
-// "use client";
-
-import Block from "./Block";
+import Block from "./editorUI/Block";
 // import { useRef } from "react";
 const blocks = Array(3).fill(0);
 
@@ -25,7 +23,6 @@ export default function Editor() {
               className="border border-dashed border-black"
               variant={key === 0 ? "h1" : "paragraph"}
               itemkey={key}
-              // ref={(el) => divRefs.current.push(el as HTMLDivElement)}
             />
           </div>
         ))}
