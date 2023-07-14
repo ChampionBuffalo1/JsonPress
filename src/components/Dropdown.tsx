@@ -40,6 +40,7 @@ function BlockOption({ data }: { data: string[] }) {
   const [name, desc, url] = data;
   return (
     <div className="flex items-center justify-center mt-2 cursor-pointer">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={url}
         alt="Logo"
