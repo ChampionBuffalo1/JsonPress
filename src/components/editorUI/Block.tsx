@@ -37,23 +37,25 @@ export default function Block({
 }: BlockProps) {
   const [show, setShow] = useState<boolean>(false);
   const [filterOpts, setFilterOpts] = useState<string>("");
+  const [takeInput, setTakeInput] = useState<boolean>(false);
 
   const handleInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const { value } = event.target;
-      const index = value.lastIndexOf("/");
-      if (index !== -1) {
-        const spacePos = value.indexOf(" ", index);
-        const filterKey = value.substring(
-          index + 1,
-          spacePos !== -1 ? spacePos : value.length
-        );
-        setFilterOpts(filterKey);
-      } else {
+      const last = value.slice(-1);
+      if (last === "/") setTakeInput(true);
+      if (last === " ") {
+        setTakeInput(false);
         setFilterOpts("");
+        return;
+      }
+      if (takeInput) {
+        const index = value.lastIndexOf("/");
+        const filterKey = value.substring(index + 1);
+        setFilterOpts(filterKey);
       }
     },
-    [setFilterOpts]
+    [setFilterOpts, setTakeInput, takeInput]
   );
 
   return (
