@@ -62,14 +62,14 @@ export default forwardRef<HTMLInputElement, BlockProps>(function Block(
         <ShowIconsLeft itemkey={itemkey} show={show} />
         <input
           ref={ref}
-          placeholder="Click here to add text"
+          placeholder={itemkey === 0 ? "Untitled" : "Click here to add text"}
           className={cn(
             blockVariants({
               variant,
               className,
             })
           )}
-          onChange={handleInputChange}
+          onChange={itemkey !== 0 ? handleInputChange : undefined}
           spellCheck
           {...props}
           onFocus={() => setShow(true)}
