@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/util";
 import BlockDropdown from "../Dropdown";
-import { useCallback, useState } from "react";
+import { forwardRef, useCallback, useState } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { GripVertical, Plus, Wrench } from "lucide-react";
 
@@ -29,12 +29,10 @@ export interface BlockProps
   itemkey: number;
 }
 
-export default function Block({
-  className,
-  variant,
-  itemkey,
-  ...props
-}: BlockProps) {
+export default forwardRef<HTMLInputElement, BlockProps>(function Block(
+  { className, variant, itemkey, ...props },
+  ref
+) {
   const [show, setShow] = useState<boolean>(false);
   const [filterOpts, setFilterOpts] = useState<string>("");
   const [takeInput, setTakeInput] = useState<boolean>(false);
@@ -55,7 +53,7 @@ export default function Block({
         setFilterOpts(filterKey);
       }
     },
-    [setFilterOpts, setTakeInput, takeInput]
+    [takeInput, setTakeInput, setFilterOpts]
   );
 
   return (
@@ -63,6 +61,7 @@ export default function Block({
       <div className="w-full max-w-5xl flex mt-2 items-center">
         <ShowIconsLeft itemkey={itemkey} show={show} />
         <input
+          ref={ref}
           placeholder="Click here to add text"
           className={cn(
             blockVariants({
@@ -75,7 +74,7 @@ export default function Block({
           {...props}
           onFocus={() => setShow(true)}
           onBlur={() => setShow(false)}
-        ></input>
+        />
         <ShowIconsRight itemkey={itemkey} show={show} />
       </div>
       {filterOpts && (
@@ -86,7 +85,7 @@ export default function Block({
       )}
     </>
   );
-}
+});
 
 type SettingsProps = {
   show: boolean;
