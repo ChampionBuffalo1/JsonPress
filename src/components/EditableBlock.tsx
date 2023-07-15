@@ -17,7 +17,7 @@ export default forwardRef<HTMLDivElement, EditableBlockProps>(
     return (
       <div
         ref={ref}
-        contentEditable={attribute.disableEditable || true}
+        contentEditable={!attribute.disableEditable || true}
         {...props}
       >
         {/* @ts-ignore - I cannot be bothered to fix the typing */}
