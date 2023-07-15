@@ -1,16 +1,21 @@
+"use client";
+
 import { cn } from "@/lib/util";
+import { typeUnion } from "@/app/reducer/editor";
 
 interface BlockDropdownProps {
   className: string;
   filterKey: string;
+  onPicked: (type: typeUnion) => void;
 }
 
 export default function BlockDropdown({
   className,
   filterKey,
+  onPicked,
 }: BlockDropdownProps) {
-  const filteredOpts = blockOptions.filter(([key]) =>
-    key.toLowerCase().startsWith(filterKey)
+  const filteredOpts = blockOptions.filter(({ label }) =>
+    label.toLowerCase().startsWith(filterKey)
   );
   return (
     <div
@@ -25,10 +30,15 @@ export default function BlockDropdown({
         ) : (
           <>
             <div className="w-full text-sm ">Basic blocks</div>
-            {filteredOpts.length > 0 &&
-              filteredOpts.map((data, key) => (
+            {filteredOpts.map((data, key) => (
+              <div
+                onClick={() => {
+                  onPicked(data.type);
+                }}
+              >
                 <BlockOption key={key} data={data} />
-              ))}
+              </div>
+            ))}
           </>
         )}
       </div>
@@ -36,8 +46,15 @@ export default function BlockDropdown({
   );
 }
 
-function BlockOption({ data }: { data: string[] }) {
-  const [name, desc, url] = data;
+type Opts = {
+  type: typeUnion;
+  label: string;
+  description: string;
+  url: string;
+};
+
+function BlockOption({ data }: { data: Opts }) {
+  const { label, url, description } = data;
   return (
     <div className="flex items-center justify-center mt-2 cursor-pointer">
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -52,40 +69,60 @@ function BlockOption({ data }: { data: string[] }) {
         loading="lazy"
       />
       <div className="mx-4 w-full h-16 flex flex-col items-start pt-2">
-        <p className="text-base hover:bg-blend-darken">{name}</p>
-        <p className="text-sm text-gray-600">{desc}</p>
+        <p className="text-base hover:bg-blend-darken">{label}</p>
+        <p className="text-sm text-gray-600">{description}</p>
       </div>
     </div>
   );
 }
 // Metadata
-const blockOptions: Array<[string, string, string]> = [
-  ["Text", "Plain Text", "https://www.notion.so/images/blocks/text/en-US.png"],
-  [
-    "Heading 1",
-    "Large Heading",
-    "https://www.notion.so/images/blocks/header.57a7576a.png",
-  ],
-  [
-    "Heading 2",
-    "Medium Heading",
-    "https://www.notion.so/images/blocks/subheader.9aab4769.png",
-  ],
-  [
-    "Heading 3",
-    "Small Heading",
-    "https://www.notion.so/images/blocks/subsubheader.d0ed0bb3.png  ",
-  ],
-  [
-    "Table",
-    "For tabular data",
-    "https://www.notion.so/images/blocks/simple-table.e31a23bb.png",
-  ],
-  [
-    "List",
-    "Creates a simple bullet list",
-    "https://www.notion.so/images/blocks/bulleted-list.0e87e917.png",
-  ],
-  ["Image", "Image", ""],
-  ["Video", "Video", ""],
+const blockOptions: Opts[] = [
+  {
+    type: "paragraph",
+    label: "Text",
+    description: "Plain Text",
+    url: "https://www.notion.so/images/blocks/text/en-US.png",
+  },
+  {
+    type: "h1",
+    label: "Heading 1",
+    description: "Large Heading",
+    url: "https://www.notion.so/images/blocks/header.57a7576a.png",
+  },
+  {
+    type: "h2",
+    label: "Heading 2",
+    description: "Medium Heading",
+    url: "https://www.notion.so/images/blocks/subheader.9aab4769.png",
+  },
+  {
+    type: "h3",
+    label: "Heading 3",
+    description: "Small Heading",
+    url: "https://www.notion.so/images/blocks/subsubheader.d0ed0bb3.png",
+  },
+  {
+    type: "bullet_list",
+    label: "List",
+    description: "Bullet List",
+    url: "https://www.notion.so/images/blocks/bulleted-list.0e87e917.png",
+  },
+  {
+    type: "table",
+    label: "Table",
+    description: "For tabular data",
+    url: "https://www.notion.so/images/blocks/simple-table.e31a23bb.png",
+  },
+  {
+    type: "image",
+    label: "Image",
+    description: "Image",
+    url: "https://www.notion.so/images/blocks/image.0e0b2e3a.png",
+  },
+  {
+    type: "video",
+    label: "Video",
+    description: "Video",
+    url: "https://www.notion.so/images/blocks/video.0e0b2e3a.png",
+  },
 ];
