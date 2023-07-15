@@ -15,11 +15,7 @@ export default forwardRef<HTMLDivElement, EditableBlockProps>(
     ] as MappingType[typeof type]["component"];
     if (!Component) return null;
     return (
-      <div
-        ref={ref}
-        contentEditable={!attribute.disableEditable || true}
-        {...props}
-      >
+      <div ref={ref} contentEditable={!attribute.disableEditable} {...props}>
         {/* @ts-ignore - I cannot be bothered to fix the typing */}
         <Component {...attribute}>
           {attribute.children ? attribute.children : null}
