@@ -1,18 +1,18 @@
 "use client";
 
 import { cn } from "@/lib/util";
-import { typeUnion } from "@/app/reducer/editor";
+import { MappingKey } from "./Tags";
 
 interface BlockDropdownProps {
   className: string;
   filterKey: string;
-  onPicked: (type: typeUnion) => void;
+  onSelect: (type: MappingKey) => void;
 }
 
 export default function BlockDropdown({
   className,
   filterKey,
-  onPicked,
+  onSelect,
 }: BlockDropdownProps) {
   const filteredOpts = blockOptions.filter(({ label }) =>
     label.toLowerCase().startsWith(filterKey)
@@ -33,7 +33,7 @@ export default function BlockDropdown({
             {filteredOpts.map((data, key) => (
               <div
                 onClick={() => {
-                  onPicked(data.type);
+                  onSelect(data.type);
                 }}
               >
                 <BlockOption key={key} data={data} />
@@ -47,7 +47,7 @@ export default function BlockDropdown({
 }
 
 type Opts = {
-  type: typeUnion;
+  type: MappingKey;
   label: string;
   description: string;
   url: string;
@@ -101,12 +101,12 @@ const blockOptions: Opts[] = [
     description: "Small Heading",
     url: "https://www.notion.so/images/blocks/subsubheader.d0ed0bb3.png",
   },
-  {
-    type: "bullet_list",
-    label: "List",
-    description: "Bullet List",
-    url: "https://www.notion.so/images/blocks/bulleted-list.0e87e917.png",
-  },
+  // {
+  //   type: "bullet_list",
+  //   label: "List",
+  //   description: "Bullet List",
+  //   url: "https://www.notion.so/images/blocks/bulleted-list.0e87e917.png",
+  // },
   {
     type: "table",
     label: "Table",
