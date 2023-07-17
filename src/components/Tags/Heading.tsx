@@ -1,10 +1,7 @@
 "use client";
 
-import { cn, uuid } from "@/lib/util";
-import BlockDropdown from "../Dropdown";
-import { useAppDispatch } from "@/app/hooks";
-import { addNode, nodeType } from "@/app/reducer/editor";
-import { forwardRef, useCallback, useState } from "react";
+import { cn } from "@/lib/util";
+import { forwardRef } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
 const blockVariants = cva(
@@ -25,81 +22,27 @@ const blockVariants = cva(
 );
 
 export interface BlockProps
-  extends Omit<React.ComponentProps<"input">, "children">,
-    VariantProps<typeof blockVariants> {
-  content?: string;
-  itemkey: number;
-}
+  extends React.ComponentProps<"input">,
+    VariantProps<typeof blockVariants> {}
 
 export default forwardRef<HTMLInputElement, BlockProps>(function Block(
-  { className, variant, itemkey, content, ...props },
+  { className, variant, ...props },
   ref
 ) {
-  const [filterOpts, setFilterOpts] = useState<string>("");
-  const [takeInput, setTakeInput] = useState<boolean>(false);
-  // const dispatch = useAppDispatch();
-
-  const handleInputChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      const { value } = event.target;
-      const last = value.slice(-1);
-      if (last === "/") setTakeInput(true);
-      if (last === " ") {
-        setTakeInput(false);
-        setFilterOpts("");
-        return;
-      }
-      if (takeInput) {
-        const index = value.lastIndexOf("/");
-        const filterKey = value.substring(index + 1);
-        setFilterOpts(filterKey);
-      }
-    },
-    [takeInput, setTakeInput, setFilterOpts]
-  );
-
   return (
     <>
-      <div>
-        {/* Using input instead of div here because when doing ctrl + c it copies the children of the div */}
-        <input
-          ref={ref}
-          placeholder={content}
-          className={cn(
-            blockVariants({
-              variant,
-              className,
-            })
-          )}
-          onChange={itemkey !== 0 ? handleInputChange : undefined}
-          spellCheck
-          {...props}
-        />
-      </div>
-      {filterOpts && (
-        <BlockDropdown
-          className="mx-14 border border-gray-600 rounded-md mt-1 shadow-black"
-          filterKey={filterOpts}
-          onPicked={(type) => {
-            let obj = {} as nodeType;
-            // if (type === "paragraph") {
-            //   obj = {
-            //     type,
-            //     id: uuid(),
-            //     position: 4,
-            //     content: "",
-            //   };
-            // } else if (type === "list") {
-            //   dispatch(
-            //     addNode({
-            //     })
-            //   );
-            // }
-            // dispatch(addNode(obj));
-            setFilterOpts("");
-          }}
-        />
-      )}
+      {/* Using input instead of div here because when doing ctrl + c it copies the children of the div */}
+      <input
+        ref={ref}
+        className={cn(
+          blockVariants({
+            variant,
+            className,
+          })
+        )}
+        spellCheck
+        {...props}
+      />
     </>
   );
 });
