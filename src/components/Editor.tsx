@@ -4,15 +4,38 @@ import { AppDispatch } from "@/app/store";
 import EditableBlock from "./EditableBlock";
 import { useAppDispatch } from "@/app/hooks";
 import { useAppSelector } from "@/app/hooks";
-import { addNode } from "@/app/reducer/editor";
+import { Blocks, addHeading, addNode } from "@/app/reducer/editor";
 import { useCallback, useRef, useState } from "react";
 import { GripVertical, Plus, Wrench } from "lucide-react";
+import BlockDropdown from "./Dropdown";
 
 export default function Editor() {
+  const dispatch = useAppDispatch();
   const [show, setShow] = useState<boolean>(false);
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
+  const [filterOpts, setFilterOpts] = useState<string>("");
+  const [takeInput, setTakeInput] = useState<boolean>(false);
   const blocks = useAppSelector((state) => state.editor.blocks);
-  const dispatch = useAppDispatch();
+
+  const handleChange = (event: React.FormEvent<HTMLDivElement>) => {
+    // @ts-ignore
+    const value = event.target.textContent || event.target.value;
+    if (!value) return;
+    console.log(value, filterOpts, takeInput);
+    const last = value.slice(-1);
+
+    if (last === "/") setTakeInput(true);
+    if (last === " ") {
+      setTakeInput(false);
+      setFilterOpts("");
+      return;
+    }
+    if (takeInput) {
+      const index = value.lastIndexOf("/");
+      const filterKey = value.substring(index + 1);
+      setFilterOpts(filterKey);
+    }
+  };
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
@@ -22,7 +45,11 @@ export default function Editor() {
         idx = Math.min(index + 1, itemRefs.current.length - 1);
       }
       if (event.key === "ArrowUp") idx = Math.max(index - 1, 0);
-      if (idx !== undefined) itemRefs.current[idx]?.focus();
+      if (idx !== undefined) {
+        setTakeInput(false);
+        setFilterOpts("");
+        itemRefs.current[idx]?.focus();
+      }
     },
     []
   );
@@ -40,15 +67,34 @@ export default function Editor() {
           >
             <ShowIconsLeft show={show && key !== 0} dispatch={dispatch} />
             <EditableBlock
-              className="w-full max-w-5xl flex mt-2 items-center"
-              ref={(el) => (itemRefs.current[key] = el)}
-              type={block.type}
-              attribute={block.attribute}
+              className="w-full mt-2 items-center border border-black rounded-lg p-2"
+              ref={(el) => itemRefs.current.push(el)}
+              type={block.type!}
+              attributes={{
+                ...block.attributes,
+                style: {
+                  outline: "2px solid transparent",
+                  outlineOffset: "2px",
+                },
+              }}
+              onInput={handleChange}
               onKeyDown={(e) => handleKeyDown(e, key)}
             />
             <ShowIconsRight show={show && key !== 0} />
           </div>
         ))}
+        {filterOpts && (
+          <BlockDropdown
+            // mx-14 border border-gray-600 rounded-md mt-1 shadow-black
+            className="z-10 absolute mt-2 py-2 shadow-lg rounded-md"
+            filterKey={filterOpts}
+            onSelect={(type) => {
+              // TODO: Finish this
+              // let obj = {} as Blocks;
+              setFilterOpts("");
+            }}
+          />
+        )}
       </div>
     </div>
   );
@@ -68,13 +114,9 @@ function ShowIconsLeft({ show, dispatch }: SettingsProps) {
         className="mr-2 cursor-pointer"
         onClick={() => {
           dispatch(
-            addNode({
-              type: "heading",
-              position: 4,
-              attribute: {
-                variant: "h2",
-                content: "Placehp;der",
-              },
+            addHeading({
+              variant: "h2",
+              placeholder: "placeholder text",
             })
           );
         }}
