@@ -1,55 +1,63 @@
-import List from "./List";
 import Heading from "./Heading";
-import { ComponentPropsWithRef } from "react";
+import React, { ComponentPropsWithRef, ComponentPropsWithoutRef } from "react";
 
-export type MappingKey = keyof MappingType;
+export type MappingKey = keyof JSX.IntrinsicElements | "heading" | "paragraph";
 
-export type AttributeType<T extends MappingKey> =
-  MappingType[T]["attributes"] & {
-    children?: string[];
-    variant?: string;
-    disableEditable?: boolean;
-  };
-
-const Mapping = {
-  list: List,
-  image: "img",
-  heading: Heading,
-  paragraph: "p",
-  video: "video",
+// Default mapping for the editor (along with default attributes)
+const Mapping: Record<string, MappingType> = {
+  image: {
+    component: "img",
+    attributes: {},
+  },
+  paragraph: {
+    component: "p",
+    attributes: {},
+  },
+  heading: {
+    component: Heading,
+    attributes: {},
+  },
+  video: {
+    component: "video",
+    attributes: {},
+  },
 };
 
-type OptionalAttributes<T extends React.ElementType> =
-  ComponentPropsWithRef<T> extends Record<string, unknown>
-    ? { attributes: ComponentPropsWithRef<T> }
-    : {};
-
-export interface MappingType {
-  list: {
-    component: typeof List;
-    attributes?: {};
-  } & OptionalAttributes<typeof List>;
-
-  heading: {
-    component: typeof Heading;
-    attributes: ComponentPropsWithRef<typeof Heading>;
-  };
-
-  paragraph: {
-    component: "p";
-    attributes: { children: React.ElementType[] } & OptionalAttributes<"p">;
-  };
-
-  image: {
-    component: "img";
-  } & OptionalAttributes<"img">;
-  video: {
-    component: "video";
-  } & OptionalAttributes<"video">;
-
-  // dropdown: {
-  //   component: typeof BlockDropdown;
-  // } & OptionalAttributes<typeof BlockDropdown>;
-}
+export type MappingType = {
+  type?: MappingKey;
+  component?: React.ElementType;
+  attributes?: Record<string, unknown>;
+} & (
+  | {
+      type: "li";
+      attributes: {
+        value: string;
+      } & ComponentPropsWithRef<"li">;
+    }
+  | {
+      type: "ol" | "ul";
+      attributes: {
+        children: string[];
+      } & ComponentPropsWithRef<"ol" | "ul">;
+    }
+  | {
+      type: "image";
+      attributes: ComponentPropsWithoutRef<"img">;
+    }
+  | {
+      type: "video";
+      attributes: ComponentPropsWithoutRef<"video">;
+    }
+  | {
+      type: "heading" | "paragraph";
+      attributes: {
+        children: string[];
+      } & ComponentPropsWithRef<typeof Heading>;
+    }
+  | {
+      // Do support unknown tags but no type hints for them
+      attributes?: ComponentPropsWithRef<React.ElementType>;
+    }
+);
 
 export default Mapping;
