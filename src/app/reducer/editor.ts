@@ -1,27 +1,13 @@
-import { AttributeType, MappingKey } from "@/components/Tags";
+import { MappingType } from "@/components/Tags";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
-export type nodeType = {
-  id: string;
+export type Blocks = {
   position: number;
-} & (
-  | { type: contentKey; content: string; autofocus?: boolean }
-  | {
-      type: multiContent;
-      value: string[];
-    }
-);
-export type typeUnion = nodeType["type"];
+} & MappingType;
 
-export type BlockType = {
-  position: number;
-  type: MappingKey;
-  attribute: AttributeType<MappingKey>;
-};
 export interface EditorState {
-  // blocks: nodeType[];
-  blocks: BlockType[];
+  blocks: Blocks[];
 }
 
 const initialState: EditorState = {
@@ -29,46 +15,110 @@ const initialState: EditorState = {
     {
       type: "heading",
       position: 0,
-      attribute: {
+      attributes: {
         variant: "h1",
-        disableEditable: true,
-        content: "Untitled",
+        placeholder: "Untitled",
       },
     },
     {
       position: 1,
       type: "heading",
-      attribute: {
+      attributes: {
         variant: "paragraph",
-        disableEditable: true,
-        content: "Click here to add text",
+        placeholder: "Click here to add text",
       },
     },
     {
       position: 2,
       type: "paragraph",
-      attribute: {
-        children: ["This is my first paragraph"],
+      attributes: {
+        className: "w-full",
+        contentEditable: true,
+        content: "string",
+      },
+    },
+    {
+      position: 3,
+      type: "ol",
+      attributes: {
+        contentEditable: true,
+        children: [
+          {
+            type: "li",
+            attributes: {
+              children: ["string1"],
+            },
+          },
+          {
+            type: "li",
+            attributes: {
+              children: ["string2"],
+            },
+          },
+        ],
       },
     },
   ],
 };
 
-type contentKey = "h1" | "h2" | "h3" | "paragraph" | "image" | "video";
-type multiContent = "list" | "table" | "bullet_list";
-
 export const editorSlice = createSlice({
   name: "editor",
   initialState,
   reducers: {
-    addNode(state, action: PayloadAction<BlockType>) {
+    addNode(state, action: PayloadAction<Blocks>) {
       state.blocks.push(action.payload);
       state.blocks.sort((x, y) => x.position - y.position);
     },
-    addKey(state, action: PayloadAction<nodeType>) {},
+    addHeading(
+      state,
+      action: PayloadAction<{
+        value?: string;
+        position?: number;
+        variant: "h1" | "h2" | "h3";
+        placeholder: string;
+      }>
+    ) {
+      state.blocks.push({
+        type: "heading",
+        position: action.payload.position ?? state.blocks.length,
+        attributes: {
+          variant: action.payload.variant,
+          placeholder: action.payload.placeholder,
+          value: action.payload.value,
+        },
+      });
+      state.blocks.sort((x, y) => x.position - y.position);
+    },
+    addList(
+      state,
+      action: PayloadAction<{
+        type: "ol" | "ul";
+        items: string[];
+        position?: number;
+      }>
+    ) {
+      state.blocks.push({
+        type: action.payload.type,
+        position: action.payload.position ?? state.blocks.length,
+        attributes: {
+          contentEditable: true,
+          children: action.payload.items.map((item) => ({
+            type: "li",
+            attributes: {
+              children: [item],
+            },
+          })),
+        },
+      });
+      state.blocks.sort((x, y) => x.position - y.position);
+    },
+    addParagraph(state, action: PayloadAction<{}>) {},
+    addMultiMedia(state, action: PayloadAction<unknown>) {},
+    addTable(state, action: PayloadAction<unknown>) {},
   },
 });
 
-export const { addKey, addNode } = editorSlice.actions;
+export const { addNode, addHeading, addParagraph, addMultiMedia, addTable } =
+  editorSlice.actions;
 
 export default editorSlice.reducer;
