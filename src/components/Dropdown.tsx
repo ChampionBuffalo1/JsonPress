@@ -1,12 +1,12 @@
 "use client";
 
 import { cn } from "@/lib/util";
-import { MappingKey } from "./Tags";
+import { jsonType } from "@/app/reducer/editor";
 
 interface BlockDropdownProps {
   className: string;
   filterKey: string;
-  onSelect: (type: MappingKey) => void;
+  onSelect: (type: jsonType) => void;
 }
 
 export default function BlockDropdown({
@@ -47,7 +47,7 @@ export default function BlockDropdown({
 }
 
 type Opts = {
-  type: MappingKey;
+  type: jsonType;
   label: string;
   description: string;
   url: string;
@@ -101,12 +101,12 @@ const blockOptions: Opts[] = [
     description: "Small Heading",
     url: "https://www.notion.so/images/blocks/subsubheader.d0ed0bb3.png",
   },
-  // {
-  //   type: "bullet_list",
-  //   label: "List",
-  //   description: "Bullet List",
-  //   url: "https://www.notion.so/images/blocks/bulleted-list.0e87e917.png",
-  // },
+  {
+    type: "list",
+    label: "List",
+    description: "Bullet List",
+    url: "https://www.notion.so/images/blocks/bulleted-list.0e87e917.png",
+  },
   {
     type: "table",
     label: "Table",

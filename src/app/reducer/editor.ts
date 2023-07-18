@@ -1,10 +1,19 @@
-import { MappingType } from "@/components/Tags";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { MappingKey, MappingType } from "@/components/Tags";
+
+export type jsonType =
+  | "heading"
+  | "paragraph"
+  | "image"
+  | "video"
+  | "list"
+  | MappingKey;
 
 export type Blocks = {
   position: number;
-} & MappingType;
+  type: jsonType;
+} & Omit<MappingType, "type">;
 
 export interface EditorState {
   blocks: Blocks[];
@@ -18,44 +27,37 @@ const initialState: EditorState = {
       attributes: {
         variant: "h1",
         placeholder: "Untitled",
+        children: "Okay then",
+        contentEditable: true,
       },
     },
     {
       position: 1,
       type: "heading",
       attributes: {
+        defaultValue: "string1",
         variant: "paragraph",
         placeholder: "Click here to add text",
+        contentEditable: true,
+        children: "Okay then",
       },
     },
     {
       position: 2,
       type: "paragraph",
       attributes: {
-        className: "w-full",
-        contentEditable: true,
-        content: "string",
+        // children: "Okay paaji",
+        // contentEditable: true,
+        placeholder: "Click here to add text",
       },
     },
     {
       position: 3,
-      type: "ol",
+      type: "list",
       attributes: {
+        type: "ol",
         contentEditable: true,
-        children: [
-          {
-            type: "li",
-            attributes: {
-              children: ["string1"],
-            },
-          },
-          {
-            type: "li",
-            attributes: {
-              children: ["string2"],
-            },
-          },
-        ],
+        children: ["string1", "string2"],
       },
     },
   ],
@@ -84,7 +86,7 @@ export const editorSlice = createSlice({
         attributes: {
           variant: action.payload.variant,
           placeholder: action.payload.placeholder,
-          value: action.payload.value,
+          defaultValue: action.payload.value,
         },
       });
       state.blocks.sort((x, y) => x.position - y.position);
@@ -112,7 +114,14 @@ export const editorSlice = createSlice({
       });
       state.blocks.sort((x, y) => x.position - y.position);
     },
-    addParagraph(state, action: PayloadAction<{}>) {},
+    addParagraph(
+      state,
+      action: PayloadAction<{
+        position?: number;
+        placeholder: string;
+        value?: string;
+      }>
+    ) {},
     addMultiMedia(state, action: PayloadAction<unknown>) {},
     addTable(state, action: PayloadAction<unknown>) {},
   },
