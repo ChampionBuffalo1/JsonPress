@@ -1,25 +1,25 @@
+import List from "./List";
 import Heading from "./Heading";
 import React, { ComponentPropsWithRef, ComponentPropsWithoutRef } from "react";
 
-export type MappingKey = keyof JSX.IntrinsicElements | "heading" | "paragraph";
+export type MappingKey = keyof JSX.IntrinsicElements;
 
 // Default mapping for the editor (along with default attributes)
 const Mapping: Record<string, MappingType> = {
+  list: {
+    component: List,
+  },
   image: {
     component: "img",
-    attributes: {},
   },
   paragraph: {
-    component: "p",
-    attributes: {},
+    component: Heading,
   },
   heading: {
     component: Heading,
-    attributes: {},
   },
   video: {
     component: "video",
-    attributes: {},
   },
 };
 
@@ -53,6 +53,10 @@ export type MappingType = {
       attributes: {
         children: string[];
       } & ComponentPropsWithRef<typeof Heading>;
+    }
+  | {
+      type: "list";
+      attributes: ComponentPropsWithRef<typeof List>;
     }
   | {
       // Do support unknown tags but no type hints for them
