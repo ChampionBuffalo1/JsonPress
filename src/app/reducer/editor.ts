@@ -27,8 +27,6 @@ const initialState: EditorState = {
       attributes: {
         variant: "h1",
         placeholder: "Untitled",
-        children: "Okay then",
-        contentEditable: true,
       },
     },
     {
@@ -38,16 +36,12 @@ const initialState: EditorState = {
         defaultValue: "string1",
         variant: "paragraph",
         placeholder: "Click here to add text",
-        contentEditable: true,
-        children: "Okay then",
       },
     },
     {
       position: 2,
       type: "paragraph",
       attributes: {
-        // children: "Okay paaji",
-        // contentEditable: true,
         placeholder: "Click here to add text",
       },
     },
@@ -67,8 +61,19 @@ export const editorSlice = createSlice({
   name: "editor",
   initialState,
   reducers: {
-    addNode(state, action: PayloadAction<Blocks>) {
-      state.blocks.push(action.payload);
+    addNode(
+      state,
+      action: PayloadAction<
+        {
+          position?: number;
+        } & Omit<Blocks, "position">
+      >
+    ) {
+      state.blocks.push({
+        position: action.payload.position ?? state.blocks.length,
+        type: action.payload.type,
+        attributes: action.payload.attributes,
+      });
       state.blocks.sort((x, y) => x.position - y.position);
     },
     addHeading(
