@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/util";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
 const blockVariants = cva(
@@ -22,17 +22,18 @@ const blockVariants = cva(
 );
 
 export interface BlockProps
-  extends React.ComponentProps<"input">,
+  extends React.ComponentProps<"div">,
     VariantProps<typeof blockVariants> {}
 
-export default forwardRef<HTMLInputElement, BlockProps>(function Block(
+export default forwardRef<HTMLDivElement, BlockProps>(function Block(
   { className, variant, ...props },
   ref
 ) {
+  const [display, setDisplay] = useState<boolean>(true);
   return (
     <>
-      {/* Using input instead of div here because when doing ctrl + c it copies the children of the div */}
-      <input
+      <div
+        contentEditable
         ref={ref}
         className={cn(
           blockVariants({
@@ -40,9 +41,17 @@ export default forwardRef<HTMLInputElement, BlockProps>(function Block(
             className,
           })
         )}
+        onFocus={() => {
+          if (display) setDisplay(false);
+        }}
+        onBlur={(event) => {
+          if (event.target.textContent === "") setDisplay(true);
+        }}
         spellCheck
         {...props}
-      />
+      >
+        {display && <p className="text-gray-400">{props.placeholder}</p>}
+      </div>
     </>
   );
 });
