@@ -1,20 +1,22 @@
 "use client";
 
-import { cn } from "@/lib/util";
+import { cn, uuid } from "@/lib/util";
 import BlockDropdown from "./Dropdown";
-import { ComponentPropsWithRef, useState } from "react";
+import { useAppDispatch } from "@/app/hooks";
+import { addNode, updateContent } from "@/app/reducer/editor";
 import { ShowIconsLeft, ShowIconsRight } from "./Tags/Icons";
 import BlockMapping, { MappingKey, MappingType } from "./Tags";
-import { useAppDispatch } from "@/app/hooks";
-import { addNode } from "@/app/reducer/editor";
+import { ComponentPropsWithRef, useCallback, useState } from "react";
 
 type EditableBlockProps = {
+  id: string;
   type: MappingKey;
   attributes: Record<string, MappingType>;
   currentIndex: number;
 } & ComponentPropsWithRef<"div">;
 
 function EditableBlock({
+  id,
   type,
   attributes,
   className,
@@ -26,24 +28,36 @@ function EditableBlock({
   const [filterOpts, setFilterOpts] = useState<string>("");
   const [takeInput, setTakeInput] = useState<boolean>(false);
 
-  const handleChange = (event: React.FormEvent<HTMLDivElement>) => {
-    // @ts-ignore
-    const value = event.target.textContent || event.target.value;
-    if (!value) return;
-    // console.log(value, filterOpts, takeInput);
-    const last = value.slice(-1);
-    if (last === "/") setTakeInput(true);
-    if (last === " ") {
-      setTakeInput(false);
-      setFilterOpts("");
-      return;
-    }
-    if (takeInput) {
-      const index = value.lastIndexOf("/");
-      const filterKey = value.substring(index + 1);
-      setFilterOpts(filterKey);
-    }
-  };
+  const handleChange = useCallback(
+    (event: React.FormEvent<HTMLDivElement>) => {
+      const value: string =
+        // @ts-ignore: textContent is null for input tags
+        event?.currentTarget?.textContent || event?.target?.value;
+      if (!value) return;
+      console.log("", value);
+      dispatch(
+        updateContent({
+          id,
+          type,
+          value,
+        })
+      );
+
+      const last = value.slice(-1);
+      if (last === "/") setTakeInput(true);
+      if (last === " ") {
+        setTakeInput(false);
+        setFilterOpts("");
+        return;
+      }
+      if (takeInput) {
+        const index = value.lastIndexOf("/");
+        const filterKey = value.substring(index + 1);
+        setFilterOpts(filterKey);
+      }
+    },
+    [id, type, dispatch, takeInput]
+  );
 
   const Component = BlockMapping[type]?.component || type;
   if (!Component) return null;
@@ -51,20 +65,21 @@ function EditableBlock({
     <div className="flex w-full flex-col max-w-5xl mt-1 ">
       <div
         {...props}
-        className={cn("flex", className)}
+        // BUGGY INPUT
         onInput={handleChange}
+        className={cn("flex", className)}
         onMouseOver={() => setShowIcons(true)}
         onMouseOut={() => setShowIcons(false)}
       >
         <ShowIconsLeft show={showIcons && currentIndex !== 0} />
-
         <div className="w-full border border-gray-500 rounded-lg">
           <Component
+            id={id}
+            type={type}
             {...attributes}
             className={cn(attributes.className, "outline-none")}
           />
         </div>
-
         <ShowIconsRight show={showIcons && currentIndex !== 0} />
       </div>
       {filterOpts && (
@@ -75,6 +90,7 @@ function EditableBlock({
             dispatch(
               addNode({
                 type,
+                id: uuid(),
                 attributes,
               })
             );
