@@ -14,16 +14,16 @@ interface ListProps {
   className?: string;
 }
 
-export default function List({ type, className, items, ...props }: ListProps) {
+export default function List({ type, className, ...props }: ListProps) {
   const liRefs = useRef<RefObject<HTMLLIElement>[]>([]);
-  const [children, setChildren] = useState<string[]>(items || []);
+  const [items, setItem] = useState<string[]>(props.items || []);
 
   const handleListChange = useCallback(
     (event: React.KeyboardEvent<HTMLLIElement>, currentIndex: number) => {
       if (event.key === "Enter") {
         event.preventDefault();
-        if (currentIndex === children.length - 1) {
-          setChildren((prevChild) => [...prevChild, ""]);
+        if (currentIndex === items.length - 1) {
+          setItem((prevItem) => [...prevItem, ""]);
           liRefs.current[currentIndex + 1]?.current?.focus();
           return;
         }
@@ -31,7 +31,7 @@ export default function List({ type, className, items, ...props }: ListProps) {
       }
 
       if (
-        (event.key === "ArrowDown" && currentIndex !== children.length - 1) ||
+        (event.key === "ArrowDown" && currentIndex !== items.length - 1) ||
         (event.key === "ArrowUp" && currentIndex !== 0)
       ) {
         event.stopPropagation();
@@ -44,20 +44,18 @@ export default function List({ type, className, items, ...props }: ListProps) {
         event.key === "Backspace" &&
         !event.currentTarget.textContent
       ) {
-        setChildren((prevChilds) =>
-          prevChilds.filter((_, i) => i !== currentIndex)
-        );
+        setItem((prevItems) => prevItems.filter((_, i) => i !== currentIndex));
         liRefs.current[currentIndex - 1]?.current?.focus();
       }
     },
-    [liRefs, children]
+    [liRefs, items]
   );
 
   const ListComponent = type;
 
   return (
     <ListComponent className={cn(className, "w-full mx-8")} {...props}>
-      {children.map((item: string, key: number) => {
+      {items.map((item: string, key: number) => {
         const ref = createRef<HTMLLIElement>();
         liRefs.current[key] = ref;
         return (
