@@ -1,25 +1,47 @@
 "use client";
 import { cn } from "@/lib/util";
-import React, {
+import { useAppDispatch } from "@/app/hooks";
+import { updateContent } from "@/app/reducer/editor";
+import {
   useRef,
   useState,
+  useEffect,
   RefObject,
   createRef,
+  FormEvent,
   useCallback,
+  KeyboardEvent,
 } from "react";
 
 interface ListProps {
+  id: string;
   items: string[];
   type: "ol" | "ul";
   className?: string;
 }
 
-export default function List({ type, className, ...props }: ListProps) {
+export default function List({ id, type, className, ...props }: ListProps) {
+  const dispatch = useAppDispatch();
   const liRefs = useRef<RefObject<HTMLLIElement>[]>([]);
   const [items, setItem] = useState<string[]>(props.items || []);
 
+  useEffect(() => {
+    const handleDispatch = () => {
+      if (!id) return;
+      dispatch(
+        updateContent({
+          id,
+          type: "list",
+          value: items,
+        })
+      );
+    };
+    window.addEventListener("dispatch", handleDispatch);
+    return () => window.removeEventListener("dispatch", handleDispatch);
+  }, [id, items, dispatch]);
+
   const handleListChange = useCallback(
-    (event: React.KeyboardEvent<HTMLLIElement>, currentIndex: number) => {
+    (event: KeyboardEvent<HTMLLIElement>, currentIndex: number) => {
       if (event.key === "Enter") {
         event.preventDefault();
         if (currentIndex === items.length - 1) {
@@ -27,7 +49,7 @@ export default function List({ type, className, ...props }: ListProps) {
           liRefs.current[currentIndex + 1]?.current?.focus();
           return;
         }
-        liRefs.current[currentIndex + 1]?.current?.focus();
+        return liRefs.current[currentIndex + 1]?.current?.focus();
       }
 
       if (
@@ -36,7 +58,7 @@ export default function List({ type, className, ...props }: ListProps) {
       ) {
         event.stopPropagation();
         const idx = currentIndex + (event.key === "ArrowDown" ? 1 : -1);
-        liRefs.current[idx]?.current?.focus();
+        return liRefs.current[idx]?.current?.focus();
       }
 
       if (
@@ -45,8 +67,14 @@ export default function List({ type, className, ...props }: ListProps) {
         !event.currentTarget.textContent
       ) {
         setItem((prevItems) => prevItems.filter((_, i) => i !== currentIndex));
-        liRefs.current[currentIndex - 1]?.current?.focus();
+        return liRefs.current[currentIndex - 1]?.current?.focus();
       }
+      // BUG: Doesn't save the last entered char.
+      // Using onInput breaks because li is contentEditable so the pointer is always re-focused
+      const newItems = items.map((item, i) =>
+        i === currentIndex ? event.currentTarget.textContent || "" : item
+      );
+      setItem(newItems);
     },
     [liRefs, items]
   );
@@ -54,7 +82,11 @@ export default function List({ type, className, ...props }: ListProps) {
   const ListComponent = type;
 
   return (
-    <ListComponent className={cn(className, "w-full mx-8")} {...props}>
+    <ListComponent
+      className={cn(className, "w-full mx-8")}
+      {...props}
+      onInput={(e) => e.stopPropagation()}
+    >
       {items.map((item: string, key: number) => {
         const ref = createRef<HTMLLIElement>();
         liRefs.current[key] = ref;
@@ -63,7 +95,7 @@ export default function List({ type, className, ...props }: ListProps) {
             ref={ref}
             key={key}
             contentEditable
-            onKeyDown={(e) => handleListChange(e, key)}
+            onKeyDownCapture={(e) => handleListChange(e, key)}
             className={cn(
               "outline-none list-decimal",
               type === "ul" && "list-disc"
