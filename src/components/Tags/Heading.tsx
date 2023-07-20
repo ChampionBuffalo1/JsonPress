@@ -31,27 +31,23 @@ export default forwardRef<HTMLDivElement, BlockProps>(function Block(
 ) {
   const [display, setDisplay] = useState<boolean>(true);
   return (
-    <>
-      <div
-        contentEditable
-        ref={ref}
-        className={cn(
-          blockVariants({
-            variant,
-            className,
-          })
-        )}
-        onFocus={() => {
-          if (display) setDisplay(false);
-        }}
-        onBlur={(event) => {
-          if (event.target.textContent === "") setDisplay(true);
-        }}
-        spellCheck
-        {...props}
-      >
-        {display && <p className="text-gray-400">{props.placeholder}</p>}
-      </div>
-    </>
+    <div
+      contentEditable
+      ref={ref}
+      className={cn(
+        blockVariants({
+          variant,
+          className,
+        })
+      )}
+      onFocus={() => {
+        if (display) setDisplay(false);
+      }}
+      onBlur={(event) => setDisplay(event.target.textContent === "")}
+      spellCheck
+      {...props}
+    >
+      {display && <p className="text-gray-400">{props.placeholder}</p>}
+    </div>
   );
 });
