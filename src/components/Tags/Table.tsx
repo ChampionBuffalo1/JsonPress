@@ -3,14 +3,19 @@ import { Plus } from "lucide-react";
 import { ComponentPropsWithoutRef, useMemo, useState } from "react";
 
 interface TableProps extends ComponentPropsWithoutRef<"table"> {
-  prows?: number;
-  cols?: number;
+  numRow?: number;
+  numCol?: number;
   children: Array<string[]>;
 }
 
-export default function Table({ prows, cols, children, ...props }: TableProps) {
-  const [rowCount, setRowCount] = useState(prows || children.length);
-  const [colCount, setColCount] = useState(cols || children[0].length);
+export default function Table({
+  numRow,
+  numCol,
+  children,
+  ...props
+}: TableProps) {
+  const [rowCount, setRowCount] = useState(numRow || children.length);
+  const [colCount, setColCount] = useState(numCol || children[0].length);
   const rows = useMemo(
     () => Array.from({ length: rowCount }, () => Array(colCount).fill("")),
     [rowCount, colCount]
