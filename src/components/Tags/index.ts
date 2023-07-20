@@ -1,4 +1,5 @@
 import List from "./List";
+import Table from "./Table";
 import Heading from "./Heading";
 import React, { ComponentPropsWithRef, ComponentPropsWithoutRef } from "react";
 
@@ -8,6 +9,9 @@ export type MappingKey = keyof JSX.IntrinsicElements;
 const Mapping: Record<string, MappingType> = {
   list: {
     component: List,
+  },
+  table: {
+    component: Table,
   },
   image: {
     component: "img",
@@ -57,6 +61,10 @@ export type MappingType = {
   | {
       type: "list";
       attributes: ComponentPropsWithRef<typeof List>;
+    }
+  | {
+      type: "table";
+      attributes: ComponentPropsWithRef<typeof Table>;
     }
   | {
       // Do support unknown tags but no type hints for them
