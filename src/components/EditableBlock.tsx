@@ -34,7 +34,7 @@ function EditableBlock({
         // @ts-ignore: textContent is null for input tags
         event?.currentTarget?.textContent || event?.target?.value;
       if (!value) return;
-      console.log("", value);
+
       dispatch(
         updateContent({
           id,

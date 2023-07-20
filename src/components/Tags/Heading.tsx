@@ -36,7 +36,7 @@ export default function Block({
   value,
   variant,
   className,
-
+  placeholder,
   ...props
 }: BlockProps) {
   const dispatch = useAppDispatch();
@@ -44,10 +44,9 @@ export default function Block({
   const [display, setDisplay] = useState<boolean>(!value);
 
   useEffect(() => {
-    console.log("Adding Event Listener");
     const handleDispatch = () => {
       const value = divRef.current?.textContent;
-      if (!id || !value) return;
+      if (!id || !value || display) return;
       dispatch(
         updateContent({
           id,
@@ -58,7 +57,7 @@ export default function Block({
     };
     window.addEventListener("dispatch", handleDispatch);
     return () => window.removeEventListener("dispatch", handleDispatch);
-  }, [id, divRef, type, dispatch]);
+  }, [id, divRef, type, display, dispatch]);
 
   return (
     <div
@@ -76,8 +75,9 @@ export default function Block({
       onBlur={(event) => setDisplay(event.target.textContent === "")}
       spellCheck
       {...props}
+      onInput={(e) => e.stopPropagation()}
     >
-      {display && <p className="text-gray-400">{props.placeholder}</p>}
+      {display && <p className="text-gray-400">{placeholder}</p>}
       {value && value}
     </div>
   );
