@@ -28,7 +28,7 @@ export default function List({
         liRefs[idx]?.current?.focus();
       }
     },
-    [currentIndex]
+    [currentIndex, liRefs]
   );
 
   const ListComponent = type;
