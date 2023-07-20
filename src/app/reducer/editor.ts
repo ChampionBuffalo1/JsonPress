@@ -50,8 +50,7 @@ const initialState: EditorState = {
       type: "list",
       attributes: {
         type: "ol",
-        contentEditable: true,
-        children: ["string1", "string2"],
+        items: ["string1", "string2"],
       },
     },
   ],
