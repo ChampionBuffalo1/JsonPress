@@ -1,5 +1,6 @@
+import { uuid } from "@/lib/util";
 import { useAppDispatch } from "@/app/hooks";
-import { addHeading } from "@/app/reducer/editor";
+import { addParagraph } from "@/app/reducer/editor";
 import { GripVertical, Wrench, Plus } from "lucide-react";
 
 type SettingsProps = {
@@ -16,9 +17,9 @@ function ShowIconsLeft({ show }: SettingsProps) {
         className="mr-2 cursor-pointer"
         onClick={() => {
           dispatch(
-            addHeading({
-              variant: "h3",
-              placeholder: "placeholder text",
+            addParagraph({
+              id: uuid(),
+              placeholder: "Click here to add text",
             })
           );
         }}
