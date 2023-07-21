@@ -20,10 +20,19 @@ interface ListProps {
   className?: string;
 }
 
-export default function List({ id, type, className, ...props }: ListProps) {
+export default function List({
+  id,
+  type,
+
+  className,
+  ...props
+}: ListProps) {
   const dispatch = useAppDispatch();
   const liRefs = useRef<RefObject<HTMLLIElement>[]>([]);
-  const [items, setItem] = useState<string[]>(props.items || []);
+  // Items are used to render the list
+  const [items, setItems] = useState<string[]>(props.items || []);
+  // ChangeItems are used to update the content
+  const [changeItems, setChangeItem] = useState<string[]>(props.items || []);
 
   useEffect(() => {
     const handleDispatch = () => {
@@ -32,20 +41,21 @@ export default function List({ id, type, className, ...props }: ListProps) {
         updateContent({
           id,
           type: "list",
-          value: items,
+          value: changeItems,
         })
       );
     };
     window.addEventListener("dispatch", handleDispatch);
     return () => window.removeEventListener("dispatch", handleDispatch);
-  }, [id, items, dispatch]);
+  }, [id, dispatch, changeItems]);
 
   const handleListChange = useCallback(
     (event: KeyboardEvent<HTMLLIElement>, currentIndex: number) => {
       if (event.key === "Enter") {
         event.preventDefault();
         if (currentIndex === items.length - 1) {
-          setItem((prevItem) => [...prevItem, ""]);
+          setItems((prevItem) => [...prevItem, ""]);
+          setChangeItem((prevItem) => [...prevItem, ""]);
           liRefs.current[currentIndex + 1]?.current?.focus();
           return;
         }
@@ -66,15 +76,12 @@ export default function List({ id, type, className, ...props }: ListProps) {
         event.key === "Backspace" &&
         !event.currentTarget.textContent
       ) {
-        setItem((prevItems) => prevItems.filter((_, i) => i !== currentIndex));
+        setItems((prevItems) => prevItems.filter((_, i) => i !== currentIndex));
+        setChangeItem((prevItems) =>
+          prevItems.filter((_, i) => i !== currentIndex)
+        );
         return liRefs.current[currentIndex - 1]?.current?.focus();
       }
-      // BUG: Doesn't save the last entered char.
-      // Using onInput breaks because li is contentEditable so the pointer is always re-focused
-      const newItems = items.map((item, i) =>
-        i === currentIndex ? event.currentTarget.textContent || "" : item
-      );
-      setItem(newItems);
     },
     [liRefs, items]
   );
@@ -95,6 +102,13 @@ export default function List({ id, type, className, ...props }: ListProps) {
             ref={ref}
             key={key}
             contentEditable
+            onInput={(e) =>
+              setChangeItem((prev) =>
+                prev.map((item, i) =>
+                  i === key ? e.currentTarget.textContent || "" : item
+                )
+              )
+            }
             onKeyDownCapture={(e) => handleListChange(e, key)}
             className={cn(
               "outline-none list-decimal",
