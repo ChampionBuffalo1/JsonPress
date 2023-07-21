@@ -3,16 +3,35 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { MappingKey, MappingType } from "@/components/Tags";
 
 export type jsonType =
-  | "heading"
-  | "paragraph"
+  | "list"
   | "image"
   | "video"
-  | "list"
+  | "table"
+  | "heading"
+  | "paragraph"
   | MappingKey;
 
+type updateType = {
+  id: string;
+} & (
+  | {
+      type: "list";
+      value: string[];
+    }
+  | {
+      type: "table";
+      value: string[][];
+    }
+  | {
+      type: jsonType;
+      value: string;
+    }
+);
+
 export type Blocks = {
-  position: number;
+  id: string;
   type: jsonType;
+  position: number;
 } & Omit<MappingType, "type">;
 
 export interface EditorState {
@@ -22,35 +41,30 @@ export interface EditorState {
 const initialState: EditorState = {
   blocks: [
     {
+      id: "73f6e5b0",
       type: "heading",
       position: 0,
       attributes: {
         variant: "h1",
         placeholder: "Untitled",
+        value: "this is the text",
       },
     },
     {
+      id: "e3868454",
       position: 1,
       type: "heading",
       attributes: {
-        defaultValue: "string1",
         variant: "paragraph",
         placeholder: "Click here to add text",
       },
     },
     {
+      id: "0e5450f7",
       position: 2,
       type: "paragraph",
       attributes: {
         placeholder: "Click here to add text",
-      },
-    },
-    {
-      position: 3,
-      type: "list",
-      attributes: {
-        type: "ol",
-        items: ["string1", "string2"],
       },
     },
   ],
@@ -69,15 +83,17 @@ export const editorSlice = createSlice({
       >
     ) {
       state.blocks.push({
-        position: action.payload.position ?? state.blocks.length,
+        id: action.payload.id,
         type: action.payload.type,
         attributes: action.payload.attributes,
+        position: action.payload.position ?? state.blocks.length,
       });
       state.blocks.sort((x, y) => x.position - y.position);
     },
     addHeading(
       state,
       action: PayloadAction<{
+        id: string;
         value?: string;
         position?: number;
         variant: "h1" | "h2" | "h3";
@@ -86,28 +102,30 @@ export const editorSlice = createSlice({
     ) {
       state.blocks.push({
         type: "heading",
-        position: action.payload.position ?? state.blocks.length,
+        id: action.payload.id,
         attributes: {
           variant: action.payload.variant,
           placeholder: action.payload.placeholder,
           defaultValue: action.payload.value,
         },
+        position: action.payload.position ?? state.blocks.length,
       });
       state.blocks.sort((x, y) => x.position - y.position);
     },
     addList(
       state,
       action: PayloadAction<{
+        id: string;
         type: "ol" | "ul";
         items: string[];
         position?: number;
       }>
     ) {
       state.blocks.push({
+        id: action.payload.id,
         type: action.payload.type,
         position: action.payload.position ?? state.blocks.length,
         attributes: {
-          contentEditable: true,
           children: action.payload.items.map((item) => ({
             type: "li",
             attributes: {
@@ -121,17 +139,68 @@ export const editorSlice = createSlice({
     addParagraph(
       state,
       action: PayloadAction<{
-        position?: number;
-        placeholder: string;
+        id: string;
         value?: string;
+        position?: number;
+        placeholder?: string;
       }>
-    ) {},
+    ) {
+      state.blocks.push({
+        type: "paragraph",
+        id: action.payload.id,
+        position: action.payload.position ?? state.blocks.length,
+        attributes: {
+          placeholder: action.payload.placeholder || "",
+          defaultValue: action.payload.value || "",
+        },
+      });
+      state.blocks.sort((x, y) => x.position - y.position);
+    },
+    addTable(
+      state,
+      action: PayloadAction<{
+        id: string;
+        position?: number;
+        rowCount: number;
+        columnCount: number;
+      }>
+    ) {
+      state.blocks.push({
+        type: "table",
+        id: action.payload.id,
+        position: action.payload.position ?? state.blocks.length,
+        attributes: {},
+      });
+      state.blocks.sort((x, y) => x.position - y.position);
+    },
     addMultiMedia(state, action: PayloadAction<unknown>) {},
-    addTable(state, action: PayloadAction<unknown>) {},
+
+    updateContent(state, action: PayloadAction<updateType>) {
+      const index = state.blocks.findIndex(
+        (block) => block.id === action.payload.id
+      );
+      if (index === -1) {
+        addNode(action.payload);
+        return;
+      }
+      if (action.payload.type === "list") {
+        state.blocks[index].attributes.items = action.payload.value;
+      } else if (action.payload.type === "table") {
+        state.blocks[index].attributes.children = action.payload.value;
+      } else {
+        state.blocks[index].attributes.value = action.payload.value;
+      }
+    },
   },
 });
 
-export const { addNode, addHeading, addParagraph, addMultiMedia, addTable } =
-  editorSlice.actions;
+export const {
+  addNode,
+  addHeading,
+  addParagraph,
+  addMultiMedia,
+  addTable,
+  updateContent,
+} = editorSlice.actions;
 
 export default editorSlice.reducer;
