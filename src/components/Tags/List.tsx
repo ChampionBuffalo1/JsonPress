@@ -29,7 +29,8 @@ export default function List({
 }: ListProps) {
   const dispatch = useAppDispatch();
   const liRefs = useRef<RefObject<HTMLLIElement>[]>([]);
-  // Items are used to render the list
+  // This could've been done with a single state but then updating the content when user inputs
+  // causes re-render which causes the focus to be lost. So we use two states.
   const [items, setItems] = useState<string[]>(props.items || []);
   // ChangeItems are used to update the content
   const [changeItems, setChangeItem] = useState<string[]>(props.items || []);
@@ -82,6 +83,13 @@ export default function List({
         );
         return liRefs.current[currentIndex - 1]?.current?.focus();
       }
+      setChangeItem((prev) =>
+        prev.map((item, i) =>
+          i === currentIndex
+            ? liRefs.current[currentIndex]?.current?.textContent || ""
+            : item
+        )
+      );
     },
     [liRefs, items]
   );
@@ -102,13 +110,6 @@ export default function List({
             ref={ref}
             key={key}
             contentEditable
-            onInput={(e) =>
-              setChangeItem((prev) =>
-                prev.map((item, i) =>
-                  i === key ? e.currentTarget.textContent || "" : item
-                )
-              )
-            }
             onKeyDownCapture={(e) => handleListChange(e, key)}
             className={cn(
               "outline-none list-decimal",
