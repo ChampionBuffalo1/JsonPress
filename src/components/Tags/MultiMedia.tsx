@@ -33,7 +33,6 @@ MultiMediaProps) {
   const dispatch = useAppDispatch();
   const [imageSrc, setImageSrc] = useState<string>(src || "");
   useEffect(() => {
-    console.log(id);
     const handleDispatch = () => {
       dispatch(
         updateContent({
