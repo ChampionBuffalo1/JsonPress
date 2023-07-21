@@ -88,7 +88,8 @@ export const editorSlice = createSlice({
         attributes: action.payload.attributes,
         position: action.payload.position ?? state.blocks.length,
       });
-      state.blocks.sort((x, y) => x.position - y.position);
+      if (action.payload.position)
+        state.blocks.sort((x, y) => x.position - y.position);
     },
     addHeading(
       state,
@@ -100,7 +101,7 @@ export const editorSlice = createSlice({
         placeholder: string;
       }>
     ) {
-      state.blocks.push({
+      addNode({
         type: "heading",
         id: action.payload.id,
         attributes: {
@@ -108,9 +109,8 @@ export const editorSlice = createSlice({
           placeholder: action.payload.placeholder,
           defaultValue: action.payload.value,
         },
-        position: action.payload.position ?? state.blocks.length,
+        position: action.payload.position,
       });
-      state.blocks.sort((x, y) => x.position - y.position);
     },
     addList(
       state,
@@ -134,7 +134,6 @@ export const editorSlice = createSlice({
           })),
         },
       });
-      state.blocks.sort((x, y) => x.position - y.position);
     },
     addParagraph(
       state,
@@ -154,7 +153,8 @@ export const editorSlice = createSlice({
           defaultValue: action.payload.value || "",
         },
       });
-      state.blocks.sort((x, y) => x.position - y.position);
+      if (action.payload.position)
+        state.blocks.sort((x, y) => x.position - y.position);
     },
     addTable(
       state,
@@ -171,7 +171,8 @@ export const editorSlice = createSlice({
         position: action.payload.position ?? state.blocks.length,
         attributes: {},
       });
-      state.blocks.sort((x, y) => x.position - y.position);
+      if (action.payload.position)
+        state.blocks.sort((x, y) => x.position - y.position);
     },
     addMultiMedia(state, action: PayloadAction<unknown>) {},
 
@@ -187,6 +188,8 @@ export const editorSlice = createSlice({
         state.blocks[index].attributes.items = action.payload.value;
       } else if (action.payload.type === "table") {
         state.blocks[index].attributes.children = action.payload.value;
+      } else if (action.payload.type === "image") {
+        state.blocks[index].attributes.src = action.payload.value;
       } else {
         state.blocks[index].attributes.value = action.payload.value;
       }
