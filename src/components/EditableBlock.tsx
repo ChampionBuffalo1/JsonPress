@@ -3,7 +3,7 @@
 import { cn, uuid } from "@/lib/util";
 import BlockDropdown from "./Dropdown";
 import { useAppDispatch } from "@/app/hooks";
-import { addNode, updateContent } from "@/app/reducer/editor";
+import { addNode } from "@/app/reducer/editor";
 import { ShowIconsLeft, ShowIconsRight } from "./Tags/Icons";
 import BlockMapping, { MappingKey, MappingType } from "./Tags";
 import { ComponentPropsWithRef, useCallback, useState } from "react";
@@ -15,7 +15,7 @@ type EditableBlockProps = {
   currentIndex: number;
 } & ComponentPropsWithRef<"div">;
 
-function EditableBlock({
+export default function EditableBlock({
   id,
   type,
   attributes,
@@ -24,8 +24,9 @@ function EditableBlock({
   ...props
 }: EditableBlockProps) {
   const dispatch = useAppDispatch();
-  const [showIcons, setShowIcons] = useState<boolean>(false);
+
   const [filterOpts, setFilterOpts] = useState<string>("");
+  const [showIcons, setShowIcons] = useState<boolean>(false);
   const [takeInput, setTakeInput] = useState<boolean>(false);
 
   const handleChange = useCallback(
@@ -34,15 +35,6 @@ function EditableBlock({
         // @ts-ignore: textContent is null for input tags
         event?.currentTarget?.textContent || event?.target?.value;
       if (!value) return;
-
-      dispatch(
-        updateContent({
-          id,
-          type,
-          value,
-        })
-      );
-
       const last = value.slice(-1);
       if (last === "/") setTakeInput(true);
       if (last === " ") {
@@ -56,7 +48,7 @@ function EditableBlock({
         setFilterOpts(filterKey);
       }
     },
-    [id, type, dispatch, takeInput]
+    [takeInput]
   );
 
   const Component = BlockMapping[type]?.component || type;
@@ -64,15 +56,13 @@ function EditableBlock({
   return (
     <div className="flex w-full flex-col max-w-5xl mt-1 ">
       <div
-        {...props}
-        // BUGGY INPUT
         onInput={handleChange}
         className={cn("flex", className)}
         onMouseOver={() => setShowIcons(true)}
         onMouseOut={() => setShowIcons(false)}
       >
         <ShowIconsLeft show={showIcons && currentIndex !== 0} />
-        <div className="w-full border border-gray-500 rounded-lg">
+        <div className="w-full border border-gray-500 rounded-lg" {...props}>
           <Component
             id={id}
             type={type}
@@ -101,6 +91,3 @@ function EditableBlock({
     </div>
   );
 }
-
-export default EditableBlock;
-// export default forwardRef<HTMLDivElement, EditableBlockProps>(EditableBlock);
