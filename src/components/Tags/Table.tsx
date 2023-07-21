@@ -2,13 +2,19 @@
 import { Plus } from "lucide-react";
 import { useAppDispatch } from "@/app/hooks";
 import { updateContent } from "@/app/reducer/editor";
-import { ComponentPropsWithoutRef, useEffect, useState } from "react";
+import {
+  useRef,
+  useMemo,
+  useState,
+  useEffect,
+  ComponentPropsWithoutRef,
+} from "react";
 
 interface TableProps extends ComponentPropsWithoutRef<"table"> {
   id: string;
   numRow?: number;
   numCol?: number;
-  children: Array<string[]>;
+  children: string[][];
 }
 
 export default function Table({
@@ -19,34 +25,38 @@ export default function Table({
   ...props
 }: TableProps) {
   const dispatch = useAppDispatch();
-  const [rowCount, setRowCount] = useState(numRow || children.length);
+  const gridRef = useRef<string[][]>([]);
+  const rowCount = useMemo(() => numRow || children.length, [numRow, children]);
   const [colCount, setColCount] = useState(numCol || children[0].length);
-  const [rows, setRows] = useState(
+  const [grid, setGrid] = useState<string[][]>(
     children.length > 0
       ? children
       : Array.from({ length: rowCount }, () => Array(colCount).fill(""))
   );
 
   useEffect(() => {
+    gridRef.current = grid;
+  }, [grid]);
+
+  useEffect(() => {
     const handleDispatch = () => {
-      console.log("dispatching", rows);
       dispatch(
         updateContent({
           id,
           type: "table",
-          value: rows,
+          value: gridRef.current,
         })
       );
     };
     window.addEventListener("dispatch", handleDispatch);
     return () => window.removeEventListener("dispatch", handleDispatch);
-  }, [id, rows, dispatch]);
+  }, [id, gridRef, dispatch]);
 
   return (
     <div className="flex items-center m-2">
       <table {...props}>
         <tbody>
-          {rows.map((row, rowIndex) => (
+          {grid.map((row, rowIndex) => (
             <tr
               key={rowIndex}
               className="border border-solid border-gray-950 min-w-fit rounded-md"
@@ -54,29 +64,25 @@ export default function Table({
               {row.map((cell, cellIndex) => (
                 <td
                   key={cellIndex}
-                  className="border border-gray-600 px-3 py-1 outline-none w-24"
+                  className="border border-gray-600 px-3 py-1 outline-none min-w-fit w-24 break-words "
                   contentEditable
                   onInput={(e) => {
                     const value = e.currentTarget.textContent || "";
-                    setRows((prevRows) =>
-                      prevRows.map((row, i) =>
-                        i === rowIndex
-                          ? row.map((cell, j) =>
-                              j === cellIndex ? value : cell
-                            )
-                          : row
-                      )
+                    gridRef.current = gridRef.current.map((row, i) =>
+                      i === rowIndex
+                        ? row.map((cell, j) => (j === cellIndex ? value : cell))
+                        : row
                     );
                   }}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       e.preventDefault();
                       if (rowIndex === rowCount - 1) {
-                        setRowCount(rowCount + 1);
-                        setRows((prevRows) => [
-                          ...prevRows,
+                        gridRef.current = [
+                          ...gridRef.current,
                           Array(colCount).fill(""),
-                        ]);
+                        ];
+                        setGrid((grid) => [...grid, Array(colCount).fill("")]);
                       }
                     }
                   }}
@@ -94,7 +100,8 @@ export default function Table({
         className="m-2 cursor-pointer border bg-gray-300 rounded-md"
         onClick={() => {
           setColCount(colCount + 1);
-          setRows((prevRows) => prevRows.map((row) => [...row, ""]));
+          setGrid((grid) => grid.map((row) => [...row, ""]));
+          gridRef.current = gridRef.current?.map((row) => [...row, ""]);
         }}
       />
     </div>
