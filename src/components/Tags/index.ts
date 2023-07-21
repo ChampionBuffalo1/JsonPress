@@ -1,6 +1,7 @@
 import List from "./List";
 import Table from "./Table";
 import Heading from "./Heading";
+import MultiMedia from "./MultiMedia";
 import React, { ComponentPropsWithRef, ComponentPropsWithoutRef } from "react";
 
 export type MappingKey = keyof JSX.IntrinsicElements;
@@ -14,7 +15,7 @@ const Mapping: Record<string, MappingType> = {
     component: Table,
   },
   image: {
-    component: "img",
+    component: MultiMedia,
   },
   paragraph: {
     component: Heading,
@@ -45,12 +46,8 @@ export type MappingType = {
       } & ComponentPropsWithRef<"ol" | "ul">;
     }
   | {
-      type: "image";
-      attributes: ComponentPropsWithoutRef<"img">;
-    }
-  | {
-      type: "video";
-      attributes: ComponentPropsWithoutRef<"video">;
+      type: "image" | "video";
+      attributes: ComponentPropsWithoutRef<typeof MultiMedia>;
     }
   | {
       type: "heading" | "paragraph";
