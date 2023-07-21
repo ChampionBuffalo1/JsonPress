@@ -71,9 +71,12 @@ MultiMediaProps) {
         />
       )}
       {imageSrc && (
+        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={imageSrc}
           alt="Uploaded"
+          loading="lazy"
+          decoding="async"
           className="p-1 w-fit h-fit object-contain"
         />
       )}
