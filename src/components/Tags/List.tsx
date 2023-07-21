@@ -83,13 +83,6 @@ export default function List({
         );
         return liRefs.current[currentIndex - 1]?.current?.focus();
       }
-      setChangeItem((prev) =>
-        prev.map((item, i) =>
-          i === currentIndex
-            ? liRefs.current[currentIndex]?.current?.textContent || ""
-            : item
-        )
-      );
     },
     [liRefs, items]
   );
@@ -110,6 +103,12 @@ export default function List({
             ref={ref}
             key={key}
             contentEditable
+            onInput={(e) => {
+              const newItems = changeItems.map((item, i) =>
+                i === key ? e.currentTarget.textContent || "" : item
+              );
+              setChangeItem(newItems);
+            }}
             onKeyDownCapture={(e) => handleListChange(e, key)}
             className={cn(
               "outline-none list-decimal",
