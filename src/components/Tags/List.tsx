@@ -90,11 +90,7 @@ export default function List({
   const ListComponent = type;
 
   return (
-    <ListComponent
-      className={cn(className, "w-full mx-8")}
-      {...props}
-      onInput={(e) => e.stopPropagation()}
-    >
+    <ListComponent className={cn(className, "w-full mx-8")} {...props}>
       {items.map((item: string, key: number) => {
         const ref = createRef<HTMLLIElement>();
         liRefs.current[key] = ref;
