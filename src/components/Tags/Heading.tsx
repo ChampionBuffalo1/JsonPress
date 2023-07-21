@@ -33,19 +33,22 @@ export interface BlockProps
 export default function Block({
   id,
   type,
-  value,
+  value: defaultValue,
   variant,
   className,
   placeholder,
   ...props
 }: BlockProps) {
   const dispatch = useAppDispatch();
-  const divRef = createRef<HTMLDivElement>();
-  const [display, setDisplay] = useState<boolean>(!value);
+  const [value, setValue] = useState<string>(defaultValue || "");
+  const [display, setDisplay] = useState<boolean>(!defaultValue);
+
+  useEffect(() => {
+    setValue(defaultValue || "");
+  }, [defaultValue]);
 
   useEffect(() => {
     const handleDispatch = () => {
-      const value = divRef.current?.textContent;
       if (!id || !value || display) return;
       dispatch(
         updateContent({
@@ -57,12 +60,11 @@ export default function Block({
     };
     window.addEventListener("dispatch", handleDispatch);
     return () => window.removeEventListener("dispatch", handleDispatch);
-  }, [id, divRef, type, display, dispatch]);
+  }, [id, value, type, display, dispatch]);
 
   return (
     <div
       contentEditable
-      ref={divRef}
       className={cn(
         blockVariants({
           variant,
@@ -75,10 +77,12 @@ export default function Block({
       onBlur={(event) => setDisplay(event.target.textContent === "")}
       spellCheck
       {...props}
-      onInput={(e) => e.stopPropagation()}
+      onInput={(e) => {
+        setValue(e.currentTarget.textContent || "");
+      }}
     >
       {display && <p className="text-gray-400">{placeholder}</p>}
-      {value && value}
+      {defaultValue ? defaultValue : ""}
     </div>
   );
 }
