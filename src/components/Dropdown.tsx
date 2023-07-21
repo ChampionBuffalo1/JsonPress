@@ -118,14 +118,29 @@ const blockOptions: Opts[] = [
     label: "List",
     description: "Bullet List",
     url: "https://www.notion.so/images/blocks/bulleted-list.0e87e917.png",
-    defAttr: {},
+    defAttr: {
+      type: "ul",
+      items: ["item"],
+    },
+  },
+  {
+    type: "list",
+    label: "List",
+    description: "Numbered List",
+    url: "https://www.notion.so/images/blocks/numbered-list.0406affe.png",
+    defAttr: {
+      type: "ol",
+      items: ["item"],
+    },
   },
   {
     type: "table",
     label: "Table",
     description: "For tabular data",
     url: "https://www.notion.so/images/blocks/simple-table.e31a23bb.png",
-    defAttr: {},
+    defAttr: {
+      children: [["Sample"], ["Sample"]],
+    },
   },
   {
     type: "image",
