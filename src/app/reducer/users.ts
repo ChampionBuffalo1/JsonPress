@@ -1,12 +1,28 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
+type Role = "normal" | "admin" | "manager";
+
 export interface UserState {
   id: string;
-  username: string;
+  role: Role;
+  name: string;
+  token: string;
+  socialMedia?: {
+    website?: string;
+    twitter?: string;
+    facebook?: string;
+    instagram?: string;
+  };
 }
 
-const initialState: UserState = { id: "", username: "" };
+const initialState: UserState = {
+  id: "",
+  name: "",
+  role: "normal",
+  token: "",
+  socialMedia: {},
+};
 
 export const userSlice = createSlice({
   name: "user",
@@ -14,7 +30,10 @@ export const userSlice = createSlice({
   reducers: {
     setUser(state, action: PayloadAction<UserState>) {
       state.id = action.payload.id;
-      state.username = action.payload.username;
+      state.name = action.payload.name;
+      state.role = action.payload.role;
+      state.token = action.payload.token;
+      state.socialMedia = action.payload.socialMedia ?? {};
     },
   },
 });
