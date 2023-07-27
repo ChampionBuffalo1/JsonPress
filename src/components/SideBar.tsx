@@ -1,6 +1,6 @@
 import { ChevronRight } from "lucide-react";
 
-const items = ["Dashboard", "test2"];
+const items = ["Home", "test2"];
 
 export default function SideBar() {
   return (
@@ -13,7 +13,8 @@ export default function SideBar() {
                 href="#"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                <ChevronRight size={16} /> <span className="ml-3">{label}</span>
+                <ChevronRight size={16} />
+                <span className="ml-3">{label}</span>
               </a>
             </li>
           ))}
