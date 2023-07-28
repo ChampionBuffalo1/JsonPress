@@ -73,9 +73,11 @@ export default function LoginCard() {
             </label>
             <input
               required
-              className="w-full p-2 border border-gray-300 rounded-md outline-none"
+              minLength={8}
+              maxLength={32}
               type="password"
               {...register("password", { required: true })}
+              className="w-full p-2 border border-gray-300 rounded-md outline-none"
             />
             {error?.password && (
               <p className="text-red-600 text-sm mt-1">{error.password}</p>
@@ -84,16 +86,11 @@ export default function LoginCard() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Login
           </button>
         </form>
-        <div className="mt-4 text-center">
-          <a className="text-blue-500 hover:underline" href="/forgot-password">
-            Forgot Password?
-          </a>
-        </div>
       </div>
     </div>
   );
