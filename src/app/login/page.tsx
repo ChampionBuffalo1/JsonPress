@@ -11,16 +11,16 @@ interface ILogin {
   email: string;
   password: string;
 }
-
+const key = "user";
 export default function LoginCard() {
   const navigate = useRouter();
   const dispatch = useAppDispatch();
   const [error, setError] = useState<Record<string, string>>();
-  const { handleSubmit, register } = useForm<ILogin>();
+  const { register, handleSubmit } = useForm<ILogin>();
   const [isLoading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem(key);
     if (token) navigate.push("/");
   }, [navigate]);
 
@@ -44,7 +44,7 @@ export default function LoginCard() {
       return;
     }
     dispatch(setUser(data));
-    localStorage.setItem("user", JSON.stringify(data));
+    localStorage.setItem(key, JSON.stringify(data));
     navigate.push("/");
   };
 
