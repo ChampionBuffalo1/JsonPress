@@ -19,12 +19,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className + "  overflow-hidden"}>
+      {/* overflow-hidden */}
+      <body className={inter.className}>
         <SideBar />
         <GlobalProvider>
-          {/* NavUser used within NavBar component requires redux-store*/}
           <NavBar />
-          <div className="h-screen p-3 mt-14 sm:ml-96">{children}</div>
+          <div className="h-screen mt-12 sm:ml-96">{children}</div>
         </GlobalProvider>
       </body>
     </html>
