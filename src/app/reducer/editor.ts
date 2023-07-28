@@ -47,7 +47,6 @@ const initialState: EditorState = {
       attributes: {
         variant: "h1",
         placeholder: "Untitled",
-        value: "this is the text",
       },
     },
     {
@@ -74,6 +73,9 @@ export const editorSlice = createSlice({
   name: "editor",
   initialState,
   reducers: {
+    setBlocks(state, action: PayloadAction<Blocks[]>) {
+      state.blocks = action.payload;
+    },
     addNode(
       state,
       action: PayloadAction<
@@ -174,7 +176,6 @@ export const editorSlice = createSlice({
       if (action.payload.position)
         state.blocks.sort((x, y) => x.position - y.position);
     },
-    addMultiMedia(state, action: PayloadAction<unknown>) {},
 
     updateContent(state, action: PayloadAction<updateType>) {
       const index = state.blocks.findIndex(
@@ -199,10 +200,10 @@ export const editorSlice = createSlice({
 
 export const {
   addNode,
+  addTable,
+  setBlocks,
   addHeading,
   addParagraph,
-  addMultiMedia,
-  addTable,
   updateContent,
 } = editorSlice.actions;
 
