@@ -2,6 +2,7 @@
 
 import useSWR from "swr";
 import Link from "next/link";
+import Loading from "./loading";
 import { useEffect } from "react";
 import { useAppDispatch } from "./hooks";
 import { apiHost } from "@/lib/Constants";
@@ -25,11 +26,7 @@ export default function Home() {
           </button>
         </Link>
       </div>
-      {isLoading && (
-        <div className="flex justify-center items-center pt-2 text-2xl text-slate-900">
-          <h1>Loading...</h1>
-        </div>
-      )}
+      {isLoading && <Loading />}
       {error && (
         <div className="flex justify-center items-center pt-2 text-2xl text-slate-900">
           <h1>Error: {error}</h1>
