@@ -8,10 +8,16 @@ import { useAppDispatch } from "./hooks";
 import { apiHost } from "@/lib/Constants";
 import { setUser } from "./reducer/users";
 import BlogCard from "@/components/BlogCard";
+import { useSearchParams } from "next/navigation";
 
 export default function Home() {
   const dispatch = useAppDispatch();
-  const { data, error, isLoading } = useSWR(apiHost + "/blog/getAll");
+  const query = useSearchParams().get("status");
+  const { data, error, isLoading } = useSWR(
+    apiHost +
+      "/blog/getAll?status=" +
+      (query === "unpublished" ? "unpublished" : "published")
+  );
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) dispatch(setUser(JSON.parse(user)));
