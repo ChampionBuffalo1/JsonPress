@@ -24,7 +24,7 @@ export default function RootLayout({
         <SideBar />
         <GlobalProvider>
           <NavBar />
-          <div className="h-screen mt-12 sm:ml-96">{children}</div>
+          <div className="h-screen mt-16 sm:ml-96">{children}</div>
         </GlobalProvider>
       </body>
     </html>
