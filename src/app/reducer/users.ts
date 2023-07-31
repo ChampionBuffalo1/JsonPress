@@ -15,6 +15,7 @@ export interface UserState extends FlattenObject<Payload["user"]> {
 type Payload = {
   token: string;
   user: {
+    id: string;
     name: string;
     role: Role;
     socialMedia?: {
@@ -27,9 +28,10 @@ type Payload = {
 };
 
 const initialState: UserState = {
+  id: "",
   name: "",
-  role: "normal",
   token: "",
+  role: "normal",
   socialMedia: {},
 };
 
@@ -38,6 +40,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action: PayloadAction<Payload>) {
+      state.id = action.payload.user.id;
       state.token = action.payload.token;
       state.name = action.payload.user.name;
       state.role = action.payload.user.role;
