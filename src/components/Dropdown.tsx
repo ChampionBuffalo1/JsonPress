@@ -147,10 +147,7 @@ const blockOptions: Opts[] = [
     label: "Image",
     description: "Image",
     url: "https://www.notion.so/images/blocks/image.0e0b2e3a.png",
-    defAttr: {
-      src: "https://www.notion.so/images/blocks/image.0e0b2e3a.png",
-      alt: "Image Logo",
-    },
+    defAttr: {},
   },
   {
     type: "video",
