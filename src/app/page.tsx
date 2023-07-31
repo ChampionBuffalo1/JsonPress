@@ -4,14 +4,16 @@ import useSWR from "swr";
 import Link from "next/link";
 import Loading from "./loading";
 import { useEffect } from "react";
-import { useAppDispatch } from "./hooks";
+import { Blocks } from "@/types/block";
 import { apiHost } from "@/lib/Constants";
 import { setUser } from "./reducer/users";
 import BlogCard from "@/components/BlogCard";
 import { useSearchParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "./hooks";
 
 export default function Home() {
   const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.user);
   const query = useSearchParams().get("status");
   const { data, error, isLoading } = useSWR(
     apiHost +
@@ -40,8 +42,8 @@ export default function Home() {
       )}
       {data?.blogs.length > 0 && (
         <div className="grid grid-cols-4 gap-4 lg:grid-cols-4 sm:grid-cols-2">
-          {data.blogs.map((blog: any) => (
-            <BlogCard key={blog._id} data={blog} />
+          {data.blogs.map((blog: Blocks) => (
+            <BlogCard key={blog._id} data={blog} user={user} />
           ))}
         </div>
       )}
