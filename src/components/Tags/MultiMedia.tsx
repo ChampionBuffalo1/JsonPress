@@ -6,11 +6,11 @@ import { useEffect, useState } from "react";
 
 type MultiMediaProps = {
   id: string;
+  alt?: string;
 } & (
   | {
       type: "image";
       src?: string;
-      alt?: string;
     }
   | {
       type: "video";
@@ -24,12 +24,7 @@ type MultiMediaProps = {
     }
 );
 
-export default function MultiMedia({
-  id,
-  src,
-  type,
-}: // ...props
-MultiMediaProps) {
+export default function MultiMedia({ id, alt, src, type }: MultiMediaProps) {
   const dispatch = useAppDispatch();
   const [imageSrc, setImageSrc] = useState<string>(src || "");
   useEffect(() => {
@@ -74,7 +69,7 @@ MultiMediaProps) {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={imageSrc}
-          alt="Uploaded"
+          alt={alt || "Uploaded"}
           loading="lazy"
           decoding="async"
           className="p-1 w-fit h-fit object-contain"
