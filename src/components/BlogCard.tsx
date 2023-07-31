@@ -28,7 +28,7 @@ type BlogCardProps = {
 export default function BlogCard({ data }: BlogCardProps) {
   const href = `/blog/${data.slug}`;
   return (
-    <div className="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div className="min-w-sm w-auto bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
       {data.coverImage && (
         <Link href={href} prefetch={false}>
           <img
@@ -42,9 +42,9 @@ export default function BlogCard({ data }: BlogCardProps) {
       )}
       <div className="p-5">
         <Link href={href} prefetch={false}>
-          <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+          <h4 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
             {data.title}
-          </h5>
+          </h4>
         </Link>
         <p className="mb-3 font-normal text-gray-700 dark:text-gray-400 pb-2">
           {data.description || "No description"}
