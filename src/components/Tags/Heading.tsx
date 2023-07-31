@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/util";
 import { useAppDispatch } from "@/app/hooks";
-import { createRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { cva, VariantProps } from "class-variance-authority";
 import { jsonType, updateContent } from "@/app/reducer/editor";
 
@@ -33,37 +33,38 @@ export interface BlockProps
 export default function Block({
   id,
   type,
-  value: defaultValue,
+  value,
   variant,
   className,
   placeholder,
   ...props
 }: BlockProps) {
+  const valueRef = useRef<string>();
   const dispatch = useAppDispatch();
-  const [value, setValue] = useState<string>(defaultValue || "");
-  const [display, setDisplay] = useState<boolean>(!defaultValue);
+  const [display, setDisplay] = useState<boolean>(true);
 
   useEffect(() => {
-    setValue(defaultValue || "");
-  }, [defaultValue]);
+    valueRef.current = value;
+  }, [value]);
 
   useEffect(() => {
     const handleDispatch = () => {
-      if (!id || !value || display) return;
+      if (!id || !valueRef) return;
       dispatch(
         updateContent({
           id,
           type,
-          value,
+          value: valueRef.current || "",
         })
       );
     };
     window.addEventListener("dispatch", handleDispatch);
     return () => window.removeEventListener("dispatch", handleDispatch);
-  }, [id, value, type, display, dispatch]);
+  }, [id, type, dispatch]);
 
   return (
     <div
+      spellCheck
       contentEditable
       className={cn(
         blockVariants({
@@ -75,14 +76,12 @@ export default function Block({
         if (display) setDisplay(false);
       }}
       onBlur={(event) => setDisplay(event.target.textContent === "")}
-      spellCheck
       {...props}
       onInput={(e) => {
-        setValue(e.currentTarget.textContent || "");
+        valueRef.current = e.currentTarget.textContent || "";
       }}
     >
-      {display && <p className="text-gray-400">{placeholder}</p>}
-      {defaultValue ? defaultValue : ""}
+      {display ? <p className="text-gray-400">{placeholder}</p> : value}
     </div>
   );
 }
