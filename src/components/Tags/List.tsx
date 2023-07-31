@@ -8,7 +8,6 @@ import {
   useEffect,
   RefObject,
   createRef,
-  FormEvent,
   useCallback,
   KeyboardEvent,
 } from "react";
@@ -20,20 +19,11 @@ interface ListProps {
   className?: string;
 }
 
-export default function List({
-  id,
-  type,
-
-  className,
-  ...props
-}: ListProps) {
+export default function List({ id, type, className, ...props }: ListProps) {
   const dispatch = useAppDispatch();
+  const changeRefs = useRef<string[]>(props.items || []);
   const liRefs = useRef<RefObject<HTMLLIElement>[]>([]);
-  // This could've been done with a single state but then updating the content when user inputs
-  // causes re-render which causes the focus to be lost. So we use two states.
   const [items, setItems] = useState<string[]>(props.items || []);
-  // ChangeItems are used to update the content
-  const [changeItems, setChangeItem] = useState<string[]>(props.items || []);
 
   useEffect(() => {
     const handleDispatch = () => {
@@ -42,13 +32,13 @@ export default function List({
         updateContent({
           id,
           type: "list",
-          value: changeItems,
+          value: changeRefs.current,
         })
       );
     };
     window.addEventListener("dispatch", handleDispatch);
     return () => window.removeEventListener("dispatch", handleDispatch);
-  }, [id, dispatch, changeItems]);
+  }, [id, dispatch, changeRefs]);
 
   const handleListChange = useCallback(
     (event: KeyboardEvent<HTMLLIElement>, currentIndex: number) => {
@@ -56,7 +46,7 @@ export default function List({
         event.preventDefault();
         if (currentIndex === items.length - 1) {
           setItems((prevItem) => [...prevItem, ""]);
-          setChangeItem((prevItem) => [...prevItem, ""]);
+          changeRefs.current = [...changeRefs.current, ""];
           liRefs.current[currentIndex + 1]?.current?.focus();
           return;
         }
@@ -78,8 +68,8 @@ export default function List({
         !event.currentTarget.textContent
       ) {
         setItems((prevItems) => prevItems.filter((_, i) => i !== currentIndex));
-        setChangeItem((prevItems) =>
-          prevItems.filter((_, i) => i !== currentIndex)
+        changeRefs.current = changeRefs.current.filter(
+          (_, i) => i !== currentIndex
         );
         return liRefs.current[currentIndex - 1]?.current?.focus();
       }
@@ -100,10 +90,11 @@ export default function List({
             key={key}
             contentEditable
             onInput={(e) => {
-              const newItems = changeItems.map((item, i) =>
+              console.log(e.currentTarget.textContent);
+              changeRefs.current = changeRefs.current.map((item, i) =>
                 i === key ? e.currentTarget.textContent || "" : item
               );
-              setChangeItem(newItems);
+              console.log(changeRefs.current);
             }}
             onKeyDownCapture={(e) => handleListChange(e, key)}
             className={cn(
