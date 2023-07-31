@@ -1,11 +1,9 @@
 "use client";
-
-import { useState } from "react";
+import Link from "next/link";
 import EditableBlock from "./EditableBlock";
 import { useAppSelector } from "@/app/hooks";
 
-export default function Editor() {
-  const [showJson, setShowJson] = useState<boolean>(false);
+export default function Editor({ slug }: { slug?: string }) {
   const blocks = useAppSelector((state) => state.editor.blocks);
 
   return (
@@ -22,16 +20,11 @@ export default function Editor() {
             />
           </div>
         ))}
-        <button
-          className="w-14 text-xl p-2 rounded-md border border-gray-700 bg-slate-400 min-w-fit"
-          onClick={() => {
-            setShowJson(!showJson);
-            window.dispatchEvent(new Event("dispatch"));
-          }}
-        >
-          Save
-        </button>
-        {showJson && <pre>{JSON.stringify(blocks, null, 2)}</pre>}
+        <Link href={slug ? `/saveBlog?slug=${slug}` : "/saveBlog"}>
+          <button className="w-14 text-xl p-2 rounded-md border border-gray-700 bg-slate-400 min-w-fit">
+            Save
+          </button>
+        </Link>
       </div>
     </div>
   );
