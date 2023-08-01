@@ -1,18 +1,30 @@
 "use client";
-
+import useSWR from "swr";
 import { apiHost } from "@/lib/Constants";
+import { apiInstance } from "@/lib/util";
 import { useAppSelector } from "@/app/hooks";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, FormEvent, useCallback, useState } from "react";
-
-const categoryOptions = ["Opts1", "Opts2"];
+import {
+  useState,
+  useEffect,
+  FormEvent,
+  useCallback,
+  ChangeEvent,
+} from "react";
 
 export default function MetadataForm() {
   const navigator = useRouter();
   const slug = useSearchParams().get("slug");
+  const { data: categoryOptions } = useSWR(apiHost + "/blog/getAllCategory", {
+    revalidateOnReconnect: false,
+  });
   const user = useAppSelector((state) => state.user);
   const [error, setError] = useState<Record<string, string>>();
   const blocks = useAppSelector((state) => state.editor.blocks);
+
+  useEffect(() => {
+    window.dispatchEvent(new Event("dispatch"));
+  }, []);
 
   const [formData, setFormData] = useState<Record<AllowedKeys, string>>({
     slug: slug || "",
@@ -22,30 +34,46 @@ export default function MetadataForm() {
     description: "",
   });
 
-  const createPost = useCallback(async () => {
-    if (!user.token) {
-      navigator.push("/login");
-      return;
+  const createPost = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (!user.token) {
+        navigator.push("/login");
+        return;
+      }
+      apiInstance
+        .post(
+          "/blog/create",
+          JSON.stringify({
+            ...formData,
+            content: blocks,
+          })
+        )
+        .then(({ data }) => {
+          navigator.push("/blog/" + data.blog.slug + "?q=unpublished");
+        })
+        .catch((err) => {
+          setError(err.response.data.message);
+        });
+    },
+    [formData, user, blocks, setError, navigator]
+  );
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.addEventListener("loadend", (e) => {
+        if (e.target?.result) {
+          setFormData((prevFormData) => ({
+            ...prevFormData,
+            coverImage: e.target?.result?.toString() || "",
+          }));
+        }
+      });
+      reader.readAsDataURL(file);
     }
-    console.log("createPost", formData, blocks, user.token);
-    const response = await fetch(apiHost + "/blog/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + user.token,
-      },
-      body: JSON.stringify({
-        ...formData,
-        content: blocks,
-      }),
-    });
-    const data = await response.json();
-    if (response.ok) {
-      navigator.push("/blog/" + data.blog.slug);
-    } else {
-      setError(data.message);
-    }
-  }, [user, blocks, setError, navigator]);
+  };
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -66,18 +94,9 @@ export default function MetadataForm() {
     }
   };
 
-  const handleSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
-      event?.preventDefault();
-      window.dispatchEvent(new Event("dispatch"));
-      setTimeout(createPost, 500);
-    },
-    [createPost]
-  );
-
   return (
     <div className="p-4 max-w-md mx-auto bg-white rounded-md shadow-md">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={createPost}>
         <div className="mb-4">
           <label htmlFor="title" className="block text-gray-700 font-medium">
             Title
@@ -114,6 +133,7 @@ export default function MetadataForm() {
             Category
           </label>
           <input
+            autoComplete="off"
             type="text"
             id="category"
             name="category"
@@ -124,7 +144,7 @@ export default function MetadataForm() {
             required
           />
           <datalist id="categoryOptions">
-            {categoryOptions.map((option) => (
+            {categoryOptions?.categories.map((option: string) => (
               <option key={option} value={option} />
             ))}
           </datalist>
@@ -145,6 +165,15 @@ export default function MetadataForm() {
             className="mt-1 p-2 border border-gray-300 rounded-md w-full"
             placeholder="Enter description"
           />
+        </div>
+        <div className="mb-4">
+          <label
+            htmlFor="description"
+            className="block text-gray-700 font-medium"
+          >
+            Cover Image
+          </label>
+          <input type="file" name="coverImage" onChange={handleFileSelect} />
         </div>
 
         <button
