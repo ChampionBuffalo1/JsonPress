@@ -76,6 +76,9 @@ export const editorSlice = createSlice({
     setBlocks(state, action: PayloadAction<Blocks[]>) {
       state.blocks = action.payload;
     },
+    resetBlock(state) {
+      Object.assign(state, initialState);
+    },
     addNode(
       state,
       action: PayloadAction<
@@ -203,6 +206,7 @@ export const {
   addTable,
   setBlocks,
   addHeading,
+  resetBlock,
   addParagraph,
   updateContent,
 } = editorSlice.actions;

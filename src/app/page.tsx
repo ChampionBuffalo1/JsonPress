@@ -8,6 +8,7 @@ import { Blocks } from "@/types/block";
 import { apiHost } from "@/lib/Constants";
 import { setUser } from "./reducer/users";
 import BlogCard from "@/components/BlogCard";
+import { resetBlock } from "./reducer/editor";
 import { useAppDispatch, useAppSelector } from "./hooks";
 
 export default function Home() {
@@ -28,6 +29,7 @@ export default function Home() {
             className="border bg-green-500 rounded-md min-w-fit min-h-fit w-20 h-10 text-gray-100 text-lg border-neutral-300
             hover:bg-green-600 hover:border-green-600 hover:text-gray disabled:bg-neutral-700 disabled:cursor-not-allowed"
             disabled={!user.token}
+            onClick={() => dispatch(resetBlock())}
           >
             Create
           </button>
