@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import EditableBlock from "./EditableBlock";
 import { useAppSelector } from "@/app/hooks";
@@ -20,8 +21,13 @@ export default function Editor({ slug }: { slug?: string }) {
             />
           </div>
         ))}
-        <Link href={slug ? `/saveBlog?slug=${slug}` : "/saveBlog"}>
-          <button className="w-14 text-xl p-2 rounded-md border border-gray-700 bg-slate-400 min-w-fit">
+
+        <Link
+          href={slug ? `/saveBlog?slug=${slug}` : "/saveBlog"}
+          prefetch={false}
+          className="flex flex-row-reverse mt-2 mx-2"
+        >
+          <button className="w-14 text-xl p-2 rounded-md border border-neutral-500 bg-green-400 min-w-fit text-neutral-800">
             Save
           </button>
         </Link>
