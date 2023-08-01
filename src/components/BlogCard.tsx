@@ -1,22 +1,22 @@
 import Link from "next/link";
+import { Blog } from "@/blog";
 import { ReactNode } from "react";
-import { Blocks } from "@/types/block";
 import { apiInstance } from "@/lib/util";
 import { Check, MoveRight, X } from "lucide-react";
-import type { UserState } from "@/app/reducer/users";
 
 export default function BlogCard({
   data,
-  user,
+  role,
+  id,
 }: {
-  data: Blocks;
-  user: UserState;
+  data: Blog;
+  role: string;
+  id: string;
 }) {
   const href = data.isPublished
     ? `/blog/${data.slug}`
     : `/unpublished/${data.slug}`;
-  const pub =
-    data.isPublished || user.role !== "normal" || data.author._id === user.id;
+  const pub = data.isPublished || role !== "normal" || data.author._id === id;
   return (
     <div className="min-w-sm w-auto bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
       {data.coverImage && (
@@ -63,7 +63,7 @@ export default function BlogCard({
         <p className="text-lg mt-2 text-neutral-400">
           Posted By: {data.author.name}
         </p>
-        {!data.isPublished && user.role !== "normal" && (
+        {!data.isPublished && role !== "normal" && (
           <div className="flex flex-row-reverse">
             <button
               className="text-red-500 mx-1"
