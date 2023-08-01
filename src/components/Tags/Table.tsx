@@ -49,7 +49,7 @@ export default function Table({
       );
     };
     window.addEventListener("dispatch", handleDispatch);
-    return () => window.removeEventListener("dispatch", handleDispatch);
+    // return () => window.removeEventListener("dispatch", handleDispatch);
   }, [id, gridRef, dispatch]);
 
   return (

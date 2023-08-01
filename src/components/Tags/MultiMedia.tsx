@@ -38,7 +38,7 @@ export default function MultiMedia({ id, alt, src, type }: MultiMediaProps) {
       );
     };
     window.addEventListener("dispatch", handleDispatch);
-    return () => window.removeEventListener("dispatch", handleDispatch);
+    // return () => window.removeEventListener("dispatch", handleDispatch);
   }, [id, imageSrc, dispatch]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {

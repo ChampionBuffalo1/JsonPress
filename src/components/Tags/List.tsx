@@ -37,7 +37,7 @@ export default function List({ id, type, className, ...props }: ListProps) {
       );
     };
     window.addEventListener("dispatch", handleDispatch);
-    return () => window.removeEventListener("dispatch", handleDispatch);
+    // return () => window.removeEventListener("dispatch", handleDispatch);
   }, [id, dispatch, changeRefs]);
 
   const handleListChange = useCallback(
@@ -90,11 +90,9 @@ export default function List({ id, type, className, ...props }: ListProps) {
             key={key}
             contentEditable
             onInput={(e) => {
-              console.log(e.currentTarget.textContent);
               changeRefs.current = changeRefs.current.map((item, i) =>
                 i === key ? e.currentTarget.textContent || "" : item
               );
-              console.log(changeRefs.current);
             }}
             onKeyDownCapture={(e) => handleListChange(e, key)}
             className={cn(

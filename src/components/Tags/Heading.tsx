@@ -41,7 +41,7 @@ export default function Block({
 }: BlockProps) {
   const valueRef = useRef<string>();
   const dispatch = useAppDispatch();
-  const [display, setDisplay] = useState<boolean>(true);
+  const [display, setDisplay] = useState<boolean>(!value);
 
   useEffect(() => {
     valueRef.current = value;
@@ -59,7 +59,8 @@ export default function Block({
       );
     };
     window.addEventListener("dispatch", handleDispatch);
-    return () => window.removeEventListener("dispatch", handleDispatch);
+    // TODO: Remove event listener safely
+    // return () => window.removeEventListener("dispatch", handleDispatch);
   }, [id, type, dispatch]);
 
   return (
