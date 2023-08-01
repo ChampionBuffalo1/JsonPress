@@ -46,9 +46,12 @@ export const userSlice = createSlice({
       state.role = action.payload.user.role;
       state.socialMedia = action.payload.user.socialMedia ?? {};
     },
+    resetUser(state) {
+      Object.assign(state, initialState);
+    },
   },
 });
 
-export const { setUser } = userSlice.actions;
+export const { setUser, resetUser } = userSlice.actions;
 
 export default userSlice.reducer;
