@@ -2,26 +2,25 @@
 
 import Link from "next/link";
 import Loading from "../loading";
+import type { Blog } from "@/blog";
 import { apiInstance } from "@/lib/util";
 import { useAppSelector } from "../hooks";
 import { useRouter } from "next/navigation";
 import BlogCard from "@/components/BlogCard";
-import type { Blocks } from "@/types/block";
 import { useEffect, useState } from "react";
 
 export default function Unpublished() {
   const router = useRouter();
   const [isLoading, setLoading] = useState(true);
-  const [data, setData] = useState<{ blogs: Blocks[] }>({
-    blogs: [],
-  });
-  const user = useAppSelector((state) => state.user);
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const id = useAppSelector((state) => state.user.id);
+  const role = useAppSelector((state) => state.user.role);
   useEffect(() => {
     apiInstance
       .get("/blog/getUnpublished")
       .then((res) => {
         setLoading(false);
-        setData(res.data);
+        setBlogs(res.data.blogs);
       })
       .catch((err) => {
         if (err.response.data === "Unauthorized") router.push("/login");
@@ -39,14 +38,14 @@ export default function Unpublished() {
       </div>
       {isLoading && <Loading />}
 
-      {data?.blogs.length > 0 && (
+      {blogs.length > 0 && (
         <div className="grid grid-cols-4 gap-4 lg:grid-cols-4 sm:grid-cols-2">
-          {data.blogs.map((blog: Blocks) => (
-            <BlogCard key={blog._id} data={blog} user={user} />
+          {blogs.map((blog: Blog) => (
+            <BlogCard key={blog._id} data={blog} id={id} role={role} />
           ))}
         </div>
       )}
-      {data?.blogs.length === 0 && !isLoading && (
+      {blogs.length === 0 && !isLoading && (
         <div className="flex justify-center items-center pt-2 text-2xl text-slate-900">
           <h1>No blogs found</h1>
         </div>
