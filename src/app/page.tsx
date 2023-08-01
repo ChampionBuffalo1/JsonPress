@@ -8,28 +8,27 @@ import { Blocks } from "@/types/block";
 import { apiHost } from "@/lib/Constants";
 import { setUser } from "./reducer/users";
 import BlogCard from "@/components/BlogCard";
-import { useSearchParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "./hooks";
 
 export default function Home() {
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
-  const query = useSearchParams().get("status");
-  const { data, error, isLoading } = useSWR(
-    apiHost +
-      "/blog/getAll?status=" +
-      (query === "unpublished" ? "unpublished" : "published")
-  );
+  const { data, error, isLoading } = useSWR(apiHost + "/blog/getAll");
+
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) dispatch(setUser(JSON.parse(user)));
+    const storageUser = localStorage.getItem("user");
+    if (storageUser) dispatch(setUser(JSON.parse(storageUser)));
   }, [dispatch]);
 
   return (
     <div className="container mx-auto mt-10">
       <div className="flex flex-row-reverse ml-4 p-2">
         <Link href="/editor" prefetch={false}>
-          <button className="border bg-green-600 rounded-md min-w-fit min-h-fit w-20 h-10 text-gray-100 text-lg border-slate-800">
+          <button
+            className="border bg-green-500 rounded-md min-w-fit min-h-fit w-20 h-10 text-gray-100 text-lg border-neutral-300
+            hover:bg-green-600 hover:border-green-600 hover:text-gray disabled:bg-neutral-700 disabled:cursor-not-allowed"
+            disabled={!user.token}
+          >
             Create
           </button>
         </Link>
