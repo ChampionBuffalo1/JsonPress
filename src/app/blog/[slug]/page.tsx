@@ -1,26 +1,28 @@
 "use client";
 
 import useSWR from "swr";
-import { useEffect } from "react";
 import Loading from "@/app/loading";
 import Editor from "@/components/Editor";
 import { apiHost } from "@/lib/Constants";
 import { useAppDispatch } from "@/app/hooks";
 import { setBlocks } from "@/app/reducer/editor";
+import { useSearchParams } from "next/navigation";
 
 export default function BlogPage({ params }: { params: { slug: string } }) {
   const dispatch = useAppDispatch();
+  const publishQuery = useSearchParams().get("q");
+  const query =
+    "&status=" + (publishQuery === "unpublished" ? "unpublished" : "published");
 
   const { data, error, isLoading } = useSWR(
-    apiHost + "/blog/slug?query=" + params.slug,
+    apiHost + "/blog/slug?query=" + params.slug + query,
     {
-      revalidateOnMount: false,
+      onSuccess: (data) => {
+        if (data?.blog.content) dispatch(setBlocks(data.blog.content));
+      },
       revalidateOnFocus: false,
     }
   );
-  useEffect(() => {
-    if (data?.content) dispatch(setBlocks(data.content));
-  }, [dispatch, data]);
 
   return (
     <div>
