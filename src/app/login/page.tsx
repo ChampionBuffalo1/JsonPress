@@ -1,7 +1,7 @@
 "use client";
 
+import { apiInstance } from "@/lib/util";
 import { useForm } from "react-hook-form";
-import { apiHost } from "@/lib/Constants";
 import { useAppDispatch } from "../hooks";
 import { setUser } from "../reducer/users";
 import { useRouter } from "next/navigation";
@@ -24,28 +24,26 @@ export default function LoginCard() {
     if (token) navigate.push("/");
   }, [navigate]);
 
-  const onSubmit = async (formData: ILogin) => {
+  const onSubmit = (formData: ILogin) => {
     setLoading(true);
-    const res = await fetch(apiHost + "/user/login", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-    setLoading(false);
-    const data = await res.json();
-    if (!res.ok) {
-      setError(
-        typeof data.message === "string"
-          ? { email: data.message }
-          : data.message
-      );
-      return;
-    }
-    dispatch(setUser(data));
-    localStorage.setItem(key, JSON.stringify(data));
-    navigate.push("/");
+    apiInstance
+      .post("/user/login", JSON.stringify(formData))
+      .then((res) => {
+        setLoading(false);
+        const data = res.data;
+        dispatch(setUser(data));
+        localStorage.setItem(key, JSON.stringify(data));
+        navigate.push("/");
+      })
+      .catch((err) => {
+        setLoading(false);
+        const json = err.response.data;
+        setError(
+          typeof json.message === "string"
+            ? { email: json.message }
+            : json.message
+        );
+      });
   };
 
   return (

@@ -1,10 +1,10 @@
 "use client";
 
+import { apiInstance } from "@/lib/util";
 import { useForm } from "react-hook-form";
-import { apiHost } from "@/lib/Constants";
 import { useAppSelector } from "../hooks";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface ICreateForm {
   name: string;
@@ -13,40 +13,36 @@ interface ICreateForm {
 }
 
 export default function CreateUser() {
-  const navigate = useRouter();
+  const router = useRouter();
   const user = useAppSelector((state) => state.user);
   const [submitting, setSubmitting] = useState(true);
+  const [success, setSuccess] = useState<boolean>(false);
   const { register, handleSubmit } = useForm<ICreateForm>();
   const [error, setError] = useState<Record<string, string>>();
-  const [success, setSuccess] = useState<boolean>(false);
 
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (user) {
       const role = JSON.parse(user).role;
-      if (role === "normal" || role === "") navigate.push("/");
+      if (role === "normal" || role === "") router.push("/");
     }
     setSubmitting(false);
-  }, [navigate, setSubmitting]);
+  }, [router, setSubmitting]);
 
   const onSubmit = async (data: ICreateForm) => {
-    if (!user?.token) navigate.push("/login");
+    if (!user?.token) router.push("/login");
     setSubmitting(true);
-    const res = await fetch(apiHost + "/user/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-      body: JSON.stringify(data),
-    });
-    const json = await res.json();
-    setSubmitting(false);
-    if (!res.ok) {
-      setError(json.message);
-      return;
-    }
-    if (json.user) setSuccess(true);
+    apiInstance
+      .post("/user/create", JSON.stringify(data))
+      .then(() => {
+        // We can only get here if the server responded with 2xx status code
+        setSuccess(true);
+        setSubmitting(false);
+      })
+      .catch((err) => {
+        setSubmitting(false);
+        setError(err.response.data.message);
+      });
   };
 
   return (
